@@ -2,7 +2,7 @@ import yaml
 
 
 DEFAULTS = {
-    # random seed for reproducibility
+    # random seed for reproducibility, a large number is preferred
     "init_rand_seed": 1234567891,
     # dataset loader, specify the dataset here
     "dataset_name": "epic",
@@ -28,8 +28,10 @@ DEFAULTS = {
         # threshold for truncating an action
         "trunc_thresh": 0.5,
         # set to a tuple (e.g., (0.9, 1.0)) to enable random feature cropping
+        # might not be implemented by the dataloader
         "crop_ratio": None,
         # if true, force upsampling of the input features into a fixed size
+        # only used for ActivityNet
         "force_upsampling": False,
     },
     "loader": {
