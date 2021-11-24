@@ -1,3 +1,10 @@
+data/
+ckpt/
+libs/utils/dist
+libs/utils/nms_1d_cpu.egg-info
+**/build
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
