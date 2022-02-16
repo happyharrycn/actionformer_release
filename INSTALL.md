@@ -2,7 +2,7 @@
 
 - Linux
 - Python 3.5+
-- PyTorch 1.10
+- PyTorch 1.10+
 - TensorBoard
 - CUDA 11.0+
 - GCC 4.9+
@@ -14,7 +14,7 @@
 
 # Compilation
 
-Part of NMS is implemented in C++. The code should be compiled by
+Part of NMS is implemented in C++. The code can be compiled by
 
 ```shell
 cd ./libs/utils
@@ -22,4 +22,4 @@ python setup.py install --user
 cd ../..
 ```
 
-You will need to recompile the code every time you update pytorch.
+The code should be recompiled every time you update PyTorch.
