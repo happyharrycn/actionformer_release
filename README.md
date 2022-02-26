@@ -3,7 +3,9 @@
 ## Introduction
 This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 65.6% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 8.7 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.0% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our tech report can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
 
-![](teaser.jpg)
+<div align="center">
+  <img src="teaser.jpg" width="600px"/>
+</div>
 
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
@@ -21,7 +23,7 @@ The structure of this code repo is heavily inspired by Detectron2. Some of the m
 ## To Reproduce Our Results on THUMOS14
 **Download Features and Annotations**
 * Download *thumos.tar.gz* (`md5sum 375f76ffbf7447af1035e694971ec9b2`) from [this Box link](https://uwmadison.box.com/s/glpuxadymf3gd01m1cj6g5c3bn39qbgr) or [this Google Drive link](https://drive.google.com/file/d/1zt2eoldshf99vJMDuu8jqxda55dCyhZP/view?usp=sharing).
-* The file include I3D features, action annotations in json format (similar to ActivityNet annotation format), and external classification scores.
+* The file includes I3D features, action annotations in json format (similar to ActivityNet annotation format), and external classification scores.
 
 **Details**: The features are extracted from two-stream I3D models pretrained on Kinetics using clips of `16 frames` at the video frame rate (`~30 fps`) and a stride of `4 frames`. This gives one feature vector per `4/30 ~= 0.1333` seconds.
 
@@ -62,7 +64,7 @@ python ./eval.py ./configs/thumos_i3d.yaml ./ckpt/thumos_i3d_reproduce
 ## To Reproduce Our Results on ActivityNet 1.3
 **Download Features and Annotations**
 * Download *anet_1.3.tar.gz* (`md5sum c415f50120b9425ee1ede9ac3ce11203`) from [this Box link](https://uwmadison.box.com/s/aisdoymowukc99zoc7gpqegxbb4whikx) or [this Google Drive Link](https://drive.google.com/file/d/1VW8px1Nz9A17i0wMVUfxh6YsPCLVqL-S/view?usp=sharing).
-* The file include TSP features, action annotations in json format (similar to ActivityNet annotation format), and external classification scores.
+* The file includes TSP features, action annotations in json format (similar to ActivityNet annotation format), and external classification scores.
 
 **Details**: The features are extracted from the R(2+1)D-34 model pretrained with TSP on ActivityNet using clips of `16 frames` at a frame rate of `15 fps` and a stride of `16 frames` (*i.e.,* **non-overlapping** clips). This gives one feature vector per `16/15 ~= 1.067` seconds. The features are converted into numpy files for our code.
 
