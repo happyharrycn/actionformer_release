@@ -62,6 +62,7 @@ python ./eval.py ./configs/thumos_i3d.yaml ./ckpt/thumos_i3d_reproduce
 * Training our model on THUMOS requires ~4.5GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
 
 **[Optional] Evaluating Our Pre-trained Model**
+
 We also provide a pre-trained model for THUMOS 14. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1zoijW_NlPXzDHrkvr3jEdqn7-hxv0yv-/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
 
 * Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
@@ -138,6 +139,7 @@ python ./eval.py ./configs/anet_tsp.yaml ./ckpt/anet_tsp_reproduce
 * Training our model on ActivityNet requires ~4.6GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
 
 **[Optional] Evaluating Our Pre-trained Model**
+
 We also provide a pre-trained model for ActivityNet 1.3. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1BKfCXw-YdLvxmiABPPm3A6D6K8_MCkWY/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
 
 * Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
@@ -219,6 +221,7 @@ python ./eval.py ./configs/epic_slowfast_noun.yaml ./ckpt/epic_slowfast_noun_rep
 * Training our model on EPIC Kitchens requires ~4.5GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
 
 **[Optional] Evaluating Our Pre-trained Model**
+
 We also provide a pre-trained model for EPIC-Kitchens 100. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1soUXMt0Vnf-b4vIivKEtyEyZijRccSJ0/view?usp=sharing) (verb), and from this [Google Drive link](https://drive.google.com/file/d/1aOYz2kEUJNJJo387kCOQCkdAvk0Hmi9f/view?usp=sharing) (noun). To evaluate the pre-trained model, please follow the steps listed below.
 
 * Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
