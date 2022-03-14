@@ -89,7 +89,7 @@ This folder
 ```shell
 python ./eval.py ./configs/thumos_i3d.yaml ./pretrained/thumos_i3d_reproduce/
 ```
-* The results should be
+* The results (mAP at tIoUs) should be
 
 | Method            |  0.3  |  0.4  |  0.5  |  0.6  |  0.7  |  Avg  |
 |-------------------|-------|-------|-------|-------|-------|-------|
@@ -165,7 +165,7 @@ This folder
 ```shell
 python ./eval.py ./configs/anet_tsp.yaml ./pretrained/anet_tsp_reproduce/
 ```
-* The results should be
+* The results (mAP at tIoUs) should be
 
 | Method            |  0.5  |  0.75 |  0.95 |  Avg  |
 |-------------------|-------|-------|-------|-------|
@@ -254,7 +254,7 @@ python ./eval.py ./configs/epic_slowfast_verb.yaml ./pretrained/epic_slowfast_ve
 ```shell
 python ./eval.py ./configs/epic_slowfast_noun.yaml ./pretrained/epic_slowfast_noun_reproduce/
 ```
-* The results should be
+* The results (mAP at tIoUs) should be
 
 | Method              |  0.1  |  0.2  |  0.3  |  0.4  |  0.5  |  Avg  |
 |---------------------|-------|-------|-------|-------|-------|-------|
