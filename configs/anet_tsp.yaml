@@ -46,14 +46,14 @@ train_cfg: {
 
 # similar to THUMOS
 test_cfg: {
-  voting_thresh: 0.85,
+  voting_thresh: 0.9,
   pre_nms_topk: 2000,
   # max of 100 predictions per video
   max_seg_num: 100,
   min_score: 0.001,
   # score fusion
   multiclass_nms: False,
-  nms_sigma : 0.8,
+  nms_sigma : 0.75,
   ext_score_file: ./data/anet_1.3/annotations/cuhk_val_simp_share.json,
   duration_thresh: 0.1,
 }

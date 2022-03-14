@@ -61,6 +61,40 @@ python ./eval.py ./configs/thumos_i3d.yaml ./ckpt/thumos_i3d_reproduce
 ```
 * Training our model on THUMOS requires ~4.5GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
 
+**Evaluating Our Pre-trained Model**
+We also provide a pre-trained model for THUMOS 14. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1zoijW_NlPXzDHrkvr3jEdqn7-hxv0yv-/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
+
+* Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
+* The folder structure should look like
+```
+This folder
+│   README.md
+│   ...  
+│
+└───pretrained/
+│    └───thumos_i3d_reproduce/
+│    │	 └───thumos_reproduce_log.txt
+│    │	 └───thumos_reproduce_results.txt
+│    │   └───...    
+│    └───...
+|
+└───libs
+│
+│   ...
+```
+* The training config is recorded in *./pretrained/thumos_i3d_reproduce/config.txt*.
+* The training log is located at *./pretrained/thumos_i3d_reproduce/thumos_reproduce_log.txt* and also *./pretrained/thumos_i3d_reproduce/logs*.
+* The pre-trained model is *./pretrained/thumos_i3d_reproduce/epoch_049.pth.tar*.
+* Evaluate the pre-trained model.
+```shell
+python ./eval.py ./configs/thumos_i3d.yaml ./pretrained/thumos_i3d_reproduce/
+```
+* The results should be
+| Method            |  0.3  |  0.4  |  0.5  |  0.6  |  0.7  |  Avg  |
+|-------------------|-------|-------|-------|-------|-------|-------|
+| ActionFormer      | 75.49 | 72.48 | 65.60 | 56.56 | 42.72 | 62.57 |
+
+
 ## To Reproduce Our Results on ActivityNet 1.3
 **Download Features and Annotations**
 * Download *anet_1.3.tar.gz* (`md5sum c415f50120b9425ee1ede9ac3ce11203`) from [this Box link](https://uwmadison.box.com/s/aisdoymowukc99zoc7gpqegxbb4whikx) or [this Google Drive Link](https://drive.google.com/file/d/1VW8px1Nz9A17i0wMVUfxh6YsPCLVqL-S/view?usp=sharing).
@@ -101,6 +135,40 @@ tensorboard --logdir=./ckpt/anet_tsp_reproduce/logs
 python ./eval.py ./configs/anet_tsp.yaml ./ckpt/anet_tsp_reproduce
 ```
 * Training our model on ActivityNet requires ~4.6GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
+
+**Evaluating Our Pre-trained Model**
+We also provide a pre-trained model for ActivityNet 1.3. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1BKfCXw-YdLvxmiABPPm3A6D6K8_MCkWY/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
+
+* Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
+* The folder structure should look like
+```
+This folder
+│   README.md
+│   ...  
+│
+└───pretrained/
+│    └───anet_tsp_reproduce/
+│    │	 └───anet_tsp_reproduce_log.txt
+│    │	 └───anet_tsp_reproduce_results.txt
+│    │   └───...    
+│    └───...
+|
+└───libs
+│
+│   ...
+```
+* The training config is recorded in *./pretrained/anet_tsp_reproduce/config.txt*.
+* The training log is located at *./pretrained/anet_tsp_reproduce/anet_tsp_reproduce_log.txt* and also *./pretrained/anet_tsp_reproduce/logs*.
+* The pre-trained model is *./pretrained/anet_tsp_reproduce/epoch_014.pth.tar*.
+* Evaluate the pre-trained model.
+```shell
+python ./eval.py ./configs/anet_tsp.yaml ./pretrained/anet_tsp_reproduce/
+```
+* The results should be
+| Method            |  0.5  |  0.75 |  0.95 |  Avg  |
+|-------------------|-------|-------|-------|-------|
+| ActionFormer      | 54.28 | 37.30 |  7.87 | 36.06 |
+
 
 ## To Reproduce Our Results on EPIC Kitchens 100
 **Download Features and Annotations**
@@ -147,6 +215,49 @@ python ./eval.py ./configs/epic_slowfast_verb.yaml ./ckpt/epic_slowfast_verb_rep
 python ./eval.py ./configs/epic_slowfast_noun.yaml ./ckpt/epic_slowfast_noun_reproduce
 ```
 * Training our model on EPIC Kitchens requires ~4.5GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
+
+**Evaluating Our Pre-trained Model**
+We also provide a pre-trained model for EPIC-Kitchens 100. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1soUXMt0Vnf-b4vIivKEtyEyZijRccSJ0/view?usp=sharing) (verb), and from this [Google Drive link](https://drive.google.com/file/d/1aOYz2kEUJNJJo387kCOQCkdAvk0Hmi9f/view?usp=sharing) (noun). To evaluate the pre-trained model, please follow the steps listed below.
+
+* Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
+* The folder structure should look like
+```
+This folder
+│   README.md
+│   ...  
+│
+└───pretrained/
+│    └───epic_slowfast_verb_reproduce/
+│    │	 └───epic_slowfast_verb_reproduce_log.txt
+│    │	 └───epic_slowfast_verb_reproduce_results.txt
+│    │   └───...   
+│    └───epic_slowfast_noun_reproduce/
+│    │	 └───epic_slowfast_noun_reproduce_log.txt
+│    │	 └───epic_slowfast_noun_reproduce_results.txt
+│    │   └───...  
+│    └───...
+|
+└───libs
+│
+│   ...
+```
+* The training config is recorded in *./pretrained/epic_slowfast_(verb|noun)_reproduce/config.txt*.
+* The training log is located at *./pretrained/epic_slowfast_(verb|noun)_reproduce/epic_slowfast_(verb|noun)_reproduce_log.txt* and also *./pretrained/epic_slowfast_(verb|noun)_reproduce/logs*.
+* The pre-trained model is *./pretrained/epic_slowfast_(verb|noun)_reproduce/epoch_(029|034).pth.tar*.
+* Evaluate the pre-trained model for verbs.
+```shell
+python ./eval.py ./configs/epic_slowfast_verb.yaml ./pretrained/epic_slowfast_verb_reproduce/
+```
+* Evaluate the pre-trained model for nouns.
+```shell
+python ./eval.py ./configs/epic_slowfast_noun.yaml ./pretrained/epic_slowfast_noun_reproduce/
+```
+* The results should be
+| Method              |  0.1  |  0.2  |  0.3  |  0.4  |  0.5  |  Avg  |
+|---------------------|-------|-------|-------|-------|-------|-------|
+| ActionFormer (verb) | 26.55 | 25.58 | 24.39 | 22.39 | 18.27 | 23.44 |
+| ActionFormer (noun) | 25.51 | 24.26 | 22.60 | 20.28 | 16.59 | 21.85 |
+
 
 ## Training and Evaluating Your Own Dataset
 Work in progress. Stay tuned.
