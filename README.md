@@ -20,6 +20,10 @@ The structure of this code repo is heavily inspired by Detectron2. Some of the m
 ## Installation
 * Follow INSTALL.md for installing necessary dependencies and compiling the code.
 
+## Frequent Asked Questions
+* See FAQ.md.
+
+
 ## To Reproduce Our Results on THUMOS14
 **Download Features and Annotations**
 * Download *thumos.tar.gz* (`md5sum 375f76ffbf7447af1035e694971ec9b2`) from [this Box link](https://uwmadison.box.com/s/glpuxadymf3gd01m1cj6g5c3bn39qbgr) or [this Google Drive link](https://drive.google.com/file/d/1zt2eoldshf99vJMDuu8jqxda55dCyhZP/view?usp=sharing).
@@ -285,9 +289,9 @@ If you are using our code, please consider citing our paper.
 If you are using TSP features, please cite
 ```
 @inproceedings{alwassel2021tsp,
-  title={Tsp: Temporally-sensitive pretraining of video encoders for localization tasks},
+  title={{TSP}: Temporally-sensitive pretraining of video encoders for localization tasks},
   author={Alwassel, Humam and Giancola, Silvio and Ghanem, Bernard},
-  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision Workshops},
   pages={3173--3183},
   year={2021}
 }
