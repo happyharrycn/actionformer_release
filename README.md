@@ -20,7 +20,7 @@ The structure of this code repo is heavily inspired by Detectron2. Some of the m
 ## Installation
 * Follow INSTALL.md for installing necessary dependencies and compiling the code.
 
-## Frequent Asked Questions
+## Frequently Asked Questions
 * See FAQ.md.
 
 
