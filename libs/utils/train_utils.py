@@ -31,7 +31,7 @@ def fix_random_seed(seed, include_cuda=True):
         torch.cuda.manual_seed_all(seed)
         # this is needed for CUDA >= 10.2
         os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
-        torch.use_deterministic_algorithms(True)
+        torch.use_deterministic_algorithms(True, warn_only=True)
     else:
         cudnn.enabled = True
         cudnn.benchmark = True
@@ -271,7 +271,7 @@ def train_one_epoch(
     start = time.time()
     for iter_idx, video_list in enumerate(train_loader, 0):
         # zero out optim
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         # forward / backward the model
         losses = model(video_list)
         losses['final_loss'].backward()

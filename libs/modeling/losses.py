@@ -1,12 +1,14 @@
 import torch
 from torch.nn import functional as F
 
+@torch.jit.script
 def sigmoid_focal_loss(
-    inputs,
-    targets,
-    reduction = 'none',
-    alpha = 0.25,
-    gamma = 2.0):
+    inputs: torch.Tensor,
+    targets: torch.Tensor,
+    alpha: float = -1,
+    gamma: float = 2,
+    reduction: str = "none",
+) -> torch.Tensor:
     """
     Loss used in RetinaNet for dense detection: https://arxiv.org/abs/1708.02002.
     Taken from
@@ -30,6 +32,8 @@ def sigmoid_focal_loss(
     Returns:
         Loss tensor with the reduction option applied.
     """
+    inputs = inputs.float()
+    targets = targets.float()
     p = torch.sigmoid(inputs)
     ce_loss = F.binary_cross_entropy_with_logits(inputs, targets, reduction="none")
     p_t = p * targets + (1 - p) * (1 - targets)
@@ -47,12 +51,13 @@ def sigmoid_focal_loss(
     return loss
 
 
+@torch.jit.script
 def ctr_giou_loss_1d(
-    input_offsets,
-    target_offsets,
-    reduction = 'none',
-    eps = 1e-8
-):
+    input_offsets: torch.Tensor,
+    target_offsets: torch.Tensor,
+    reduction: str = 'none',
+    eps: float = 1e-8,
+) -> torch.Tensor:
     """
     Generalized Intersection over Union Loss (Hamid Rezatofighi et. al)
     https://arxiv.org/abs/1902.09630
@@ -72,6 +77,8 @@ def ctr_giou_loss_1d(
                  'sum': The output will be summed.
         eps (float): small number to prevent division by zero
     """
+    input_offsets = input_offsets.float()
+    target_offsets = target_offsets.float()
     # check all 1D events are valid
     assert (input_offsets >= 0.0).all(), "predicted offsets must be non-negative"
     assert (target_offsets >= 0.0).all(), "GT offsets must be non-negative"

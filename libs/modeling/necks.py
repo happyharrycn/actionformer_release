@@ -131,7 +131,7 @@ class FPNIdentity(nn.Module):
         assert len(fpn_masks) ==  len(self.in_channels)
 
         # apply norms, fpn_masks will remain the same with 1x1 convs
-        fpn_feats = []
+        fpn_feats = tuple()
         for i in range(len(self.fpn_norms)):
             x = self.fpn_norms[i](inputs[i + self.start_level])
             fpn_feats += (x, )

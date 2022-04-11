@@ -56,16 +56,13 @@ class PointGenerator(nn.Module):
 
     def _generate_points(self):
         points_list = []
-        # initial points
-        initial_points = torch.arange(0, self.max_seq_len, 1.0)
-
         # loop over all points at each pyramid level
         for l in range(self.fpn_levels):
             stride = self.scale_factor ** l
             reg_range = torch.as_tensor(
                 self.regression_range[l], dtype=torch.float)
             fpn_stride = torch.as_tensor(stride, dtype=torch.float)
-            points = initial_points[::stride][:, None]
+            points = torch.arange(0, self.max_seq_len, stride)[:, None]
             # add offset if necessary (not in our current model)
             if self.use_offset:
                 points += 0.5 * stride
