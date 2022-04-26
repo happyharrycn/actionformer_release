@@ -101,6 +101,7 @@ def main(args):
             print("=> loaded checkpoint '{:s}' (epoch {:d}".format(
                 args.resume, checkpoint['epoch']
             ))
+            del checkpoint
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
             return

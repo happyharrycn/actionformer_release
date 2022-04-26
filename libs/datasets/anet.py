@@ -190,21 +190,24 @@ class ActivityNetDataset(Dataset):
         # ok to have small negative values here
         if video_item['segments'] is not None:
             segments = torch.from_numpy(
-                (video_item['segments'] * video_item['fps']- 0.5 * num_frames) / feat_stride
+                (video_item['segments'] * video_item['fps'] - 0.5 * num_frames) / feat_stride
             )
             labels = torch.from_numpy(video_item['labels'])
             # for activity net, we have a few videos with a bunch of missing frames
             # here is a quick fix for training
             if self.is_training:
                 feat_len = feats.shape[1]
-                valid_seg_list = []
-                for seg in segments:
+                valid_seg_list, valid_label_list = [], []
+                for seg, label in zip(segments, labels):
                     if seg[0] >= feat_len:
                         # skip an action outside of the feature map
                         continue
                     # truncate an action boundary
                     valid_seg_list.append(seg.clamp(max=feat_len))
+                    # some weird bug here if not converting to size 1 tensor
+                    valid_label_list.append(label.view(1))
                 segments = torch.stack(valid_seg_list, dim=0)
+                labels = torch.cat(valid_label_list)
         else:
             segments, labels = None, None
 
