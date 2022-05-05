@@ -69,7 +69,7 @@ class THUMOS14Dataset(Dataset):
             'dataset_name': 'thumos-14',
             'tiou_thresholds': np.linspace(0.3, 0.7, 5),
             # we will mask out cliff diving
-            'empty_label_ids': [4],
+            'empty_label_ids': [],
         }
 
     def get_attributes(self):
@@ -117,13 +117,11 @@ class THUMOS14Dataset(Dataset):
             # get annotations if available
             if ('annotations' in value) and (len(value['annotations']) > 0):
                 # a fun fact of THUMOS: cliffdiving (4) is a subset of diving (7)
-                # we remove all cliffdiving from training and output 0 at inferenece
-                # as our model can't assign two labels to the same segment
+                # our code can now handle this corner case
                 segments, labels = [], []
                 for act in value['annotations']:
-                    if act['label_id'] != 4:
-                        segments.append(act['segment'])
-                        labels.append([label_dict[act['label']]])
+                    segments.append(act['segment'])
+                    labels.append([label_dict[act['label']]])
 
                 segments = np.asarray(segments, dtype=np.float32)
                 labels = np.squeeze(np.asarray(labels, dtype=np.int64), axis=1)

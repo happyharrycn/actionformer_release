@@ -86,7 +86,9 @@ def truncate_feats(
 
         if no_trunc:
             # with at least one action and not truncating any actions
-            seg_trunc_idx = (inter_ratio > 0.0) & (inter_ratio < 1.0)
+            seg_trunc_idx = torch.logical_and(
+                (inter_ratio > 0.0), (inter_ratio < 1.0)
+            )
             if (seg_idx.sum().item() > 0) and (seg_trunc_idx.sum().item() == 0):
                 break
         elif has_action:

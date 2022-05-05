@@ -451,7 +451,7 @@ class PtTransformer(nn.Module):
 
         # corner case where current sample does not have actions
         if num_gts == 0:
-            cls_targets = gt_label.new_full((num_pts,), self.num_classes)
+            cls_targets = gt_segment.new_full((num_pts, self.num_classes), 0)
             reg_targets = gt_segment.new_zeros((num_pts, 2))
             return cls_targets, reg_targets
 
@@ -496,22 +496,29 @@ class PtTransformer(nn.Module):
         # limit the regression range for each location
         max_regress_distance = reg_targets.max(-1)[0]
         # F T x N
-        inside_regress_range = (
-            (max_regress_distance >= concat_points[:, 1, None])
-            & (max_regress_distance <= concat_points[:, 2, None])
+        inside_regress_range = torch.logical_and(
+            (max_regress_distance >= concat_points[:, 1, None]),
+            (max_regress_distance <= concat_points[:, 2, None])
         )
 
         # if there are still more than one actions for one moment
         # pick the one with the shortest duration (easiest to regress)
         lens.masked_fill_(inside_gt_seg_mask==0, float('inf'))
         lens.masked_fill_(inside_regress_range==0, float('inf'))
-        # F T
+        # F T x N -> F T
         min_len, min_len_inds = lens.min(dim=1)
 
-        # cls_targets: F T; reg_targets F T x 2
-        cls_targets = gt_label[min_len_inds]
-        # set unmatched points as BG
-        cls_targets.masked_fill_(min_len==float('inf'), float(self.num_classes))
+        # corner case: multiple actions with very similar durations (e.g., THUMOS14)
+        min_len_mask = torch.logical_and(
+            (lens <= (min_len[:, None] + 1e-3)), (lens < float('inf'))
+        ).to(reg_targets.dtype)
+
+        # cls_targets: F T x C; reg_targets F T x 2
+        gt_label_one_hot = F.one_hot(
+            gt_label, self.num_classes
+        ).to(reg_targets.dtype)
+        cls_targets = min_len_mask @ gt_label_one_hot
+        # OK to use min_len_inds
         reg_targets = reg_targets[range(num_pts), min_len_inds]
         # normalization based on stride
         reg_targets /= concat_points[:, 3, None]
@@ -531,7 +538,7 @@ class PtTransformer(nn.Module):
         # 1. classification loss
         # stack the list -> (B, FT) -> (# Valid, )
         gt_cls = torch.stack(gt_cls_labels)
-        pos_mask = (gt_cls >= 0) & (gt_cls != self.num_classes) & valid_mask
+        pos_mask = torch.logical_and((gt_cls.sum(-1) > 0), valid_mask)
 
         # cat the predicted offsets -> (B, FT, 2 (xC)) -> # (#Pos, 2 (xC))
         pred_offsets = torch.cat(out_offsets, dim=1)[pos_mask]
@@ -543,11 +550,8 @@ class PtTransformer(nn.Module):
             1 - self.loss_normalizer_momentum
         ) * max(num_pos, 1)
 
-        # #cls + 1 (background)
-        gt_target = F.one_hot(
-            gt_cls[valid_mask], num_classes=self.num_classes + 1
-        )[:, :-1]
-        gt_target = gt_target.to(out_cls_logits[0].dtype)
+        # gt_cls is already one hot encoded now, simply masking out
+        gt_target = gt_cls[valid_mask]
 
         # optinal label smoothing
         gt_target *= 1 - self.train_label_smoothing
