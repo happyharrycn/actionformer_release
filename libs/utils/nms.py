@@ -8,7 +8,7 @@ import nms_1d_cpu
 class NMSop(torch.autograd.Function):
     @staticmethod
     def forward(
-        ctx, segs, cls_idxs, scores,
+        ctx, segs, scores, cls_idxs,
         iou_threshold, min_score, max_num
     ):
         # vanilla nms will not change the score, so we can filter segs first
