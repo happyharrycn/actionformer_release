@@ -10,6 +10,24 @@ from typing import Tuple
 from typing import Dict
 
 
+def remove_duplicate_annotations(ants, tol=1e-3):
+    # remove duplicate annotations (same category and starting/ending time)
+    valid_events = []
+    for event in ants:
+        s, e, l = event['segment'][0], event['segment'][1], event['label_id']
+        valid = True
+        for p_event in valid_events:
+            if ((abs(s-p_event['segment'][0]) <= tol)
+                and (abs(e-p_event['segment'][1]) <= tol)
+                and (l == p_event['label_id'])
+            ):
+                valid = False
+                break
+        if valid:
+            valid_events.append(event)
+    return valid_events
+
+
 def load_gt_seg_from_json(json_file, split=None, label='label_id', label_offset=0):
     # load json file
     with open(json_file, "r", encoding="utf8") as f:
@@ -22,11 +40,12 @@ def load_gt_seg_from_json(json_file, split=None, label='label_id', label_offset=
         # filter based on split
         if (split is not None) and v['subset'].lower() != split:
             continue
-
+        # remove duplicated instances
+        ants = remove_duplicate_annotations(v['annotations'])
         # video id
-        vids += [k] * len(v['annotations'])
+        vids += [k] * len(ants)
         # for each event, grab the start/end time and label
-        for event in v['annotations']:
+        for event in ants:
             starts += [float(event['segment'][0])]
             stops += [float(event['segment'][1])]
             if isinstance(event[label], (Tuple, List)):

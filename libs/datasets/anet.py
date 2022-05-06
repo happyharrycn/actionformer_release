@@ -9,6 +9,7 @@ from torch.nn import functional as F
 
 from .datasets import register_dataset
 from .data_utils import truncate_feats
+from ..utils import remove_duplicate_annotations
 
 @register_dataset("anet")
 class ActivityNetDataset(Dataset):
@@ -111,10 +112,11 @@ class ActivityNetDataset(Dataset):
 
             # get annotations if available
             if ('annotations' in value) and (len(value['annotations']) > 0):
-                num_acts = len(value['annotations'])
+                valid_acts = remove_duplicate_annotations(value['annotations'])
+                num_acts = len(valid_acts)
                 segments = np.zeros([num_acts, 2], dtype=np.float32)
                 labels = np.zeros([num_acts, ], dtype=np.int64)
-                for idx, act in enumerate(value['annotations']):
+                for idx, act in enumerate(valid_acts):
                     segments[idx][0] = act['segment'][0]
                     segments[idx][1] = act['segment'][1]
                     if self.num_classes == 1:

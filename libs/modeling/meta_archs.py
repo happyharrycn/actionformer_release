@@ -518,6 +518,8 @@ class PtTransformer(nn.Module):
             gt_label, self.num_classes
         ).to(reg_targets.dtype)
         cls_targets = min_len_mask @ gt_label_one_hot
+        # to prevent multiple GT actions with the same label and boundaries
+        cls_targets.clamp_(min=0.0, max=1.0)
         # OK to use min_len_inds
         reg_targets = reg_targets[range(num_pts), min_len_inds]
         # normalization based on stride
