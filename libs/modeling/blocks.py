@@ -48,13 +48,13 @@ class MaskedConv1D(nn.Module):
         if self.stride > 1:
             # downsample the mask using nearest neighbor
             out_mask = F.interpolate(
-                mask.float(),
+                mask.to(x.dtype),
                 size=T//self.stride,
                 mode='nearest'
             )
         else:
             # masking out the features
-            out_mask = mask.float()
+            out_mask = mask.to(x.dtype)
 
         # masking the output, stop grad to mask
         out_conv = out_conv * out_mask.detach()
@@ -182,12 +182,12 @@ class MaskedMHA(nn.Module):
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
         # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
-        out = att @ (v * mask[:, :, :, None].float())
+        out = att @ (v * mask[:, :, :, None].to(v.dtype))
         # re-assemble all head outputs side by side
         out = out.transpose(2, 3).contiguous().view(B, C, -1)
 
         # output projection + skip connection
-        out = self.proj_drop(self.proj(out)) * mask.float()
+        out = self.proj_drop(self.proj(out)) * mask.to(out.dtype)
         return out, mask
 
 
@@ -303,12 +303,12 @@ class MaskedMHCA(nn.Module):
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
         # (B, nh, T', T'') x (B, nh, T'', hs) -> (B, nh, T', hs)
-        out = att @ (v * kv_mask[:, :, :, None].float())
+        out = att @ (v * kv_mask[:, :, :, None].to(v.dtype))
         # re-assemble all head outputs side by side
         out = out.transpose(2, 3).contiguous().view(B, C, -1)
 
         # output projection + skip connection
-        out = self.proj_drop(self.proj(out)) * qx_mask.float()
+        out = self.proj_drop(self.proj(out)) * qx_mask.to(out.dtype)
         return out, qx_mask
 
 
@@ -647,7 +647,7 @@ class LocalMaskedMHCA(nn.Module):
         # transpose to B, nh, hs, T -> B, nh*hs, T
         out = out.transpose(2, 3).contiguous().view(B, C, -1)
         # output projection + skip connection
-        out = self.proj_drop(self.proj(out)) * qx_mask.float()
+        out = self.proj_drop(self.proj(out)) * qx_mask.to(out.dtype)
         return out, qx_mask
 
 
@@ -732,7 +732,7 @@ class TransformerBlock(nn.Module):
     def forward(self, x, mask, pos_embd=None):
         # pre-LN transformer: https://arxiv.org/pdf/2002.04745.pdf
         out, out_mask = self.attn(self.ln1(x), mask)
-        out_mask_float = out_mask.float()
+        out_mask_float = out_mask.to(out.dtype)
         out = self.pool_skip(x) * out_mask_float + self.drop_path_attn(out)
         # FFN
         out = out + self.drop_path_mlp(self.mlp(self.ln2(out)) * out_mask_float)

@@ -117,7 +117,7 @@ class ConvTransformerBackbone(nn.Module):
             assert T <= self.max_len, "Reached max length."
             pe = self.pos_embd
             # add pe to x
-            x = x + pe[:, :, :T] * mask.float()
+            x = x + pe[:, :, :T] * mask.to(x.dtype)
 
         # inference: re-interpolate position embeddings for over-length sequences
         if self.use_abs_pe and (not self.training):
@@ -127,7 +127,7 @@ class ConvTransformerBackbone(nn.Module):
             else:
                 pe = self.pos_embd
             # add pe to x
-            x = x + pe[:, :, :T] * mask.float()
+            x = x + pe[:, :, :T] * mask.to(x.dtype)
 
         # stem transformer
         for idx in range(len(self.stem)):

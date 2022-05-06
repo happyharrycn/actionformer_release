@@ -94,7 +94,7 @@ def seg_voting(nms_segs, all_segs, all_scores, iou_threshold, score_offset=1.5):
     iou = inter / (nms_seg_lens + all_seg_lens - inter)
 
     # get neighbors (# N_nms x # N_all) / weights
-    seg_weights = (iou >= iou_threshold).float() * all_scores[None, :]
+    seg_weights = (iou >= iou_threshold).to(all_scores.dtype) * all_scores[None, :]
     seg_weights /= torch.sum(seg_weights, dim=1, keepdim=True)
     refined_segs = seg_weights @ all_segs
 
