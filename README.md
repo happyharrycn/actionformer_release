@@ -10,7 +10,7 @@ This code repo implements Actionformer, one of the first Transformer-based model
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
 ## Changelog
-* 05/08/2021: We have updated the code repo based on the community feedback and our code review, leading to significantly better mAP (>66.0%) on THUMOS14 and minorly improved results on ActivityNet and EPIC-Kitchens 100. We will update the pre-trained models and our tech report shortly.
+* 05/08/2022: We have updated the code repo based on the community feedback and our code review, leading to significantly better mAP (>66.0%) on THUMOS14 and slightly improved results on ActivityNet and EPIC-Kitchens 100. We will update the pre-trained models and the tech report shortly.
 
 
 ## Code Overview
@@ -62,7 +62,7 @@ python ./train.py ./configs/thumos_i3d.yaml --output reproduce
 ```shell
 tensorboard --logdir=./ckpt/thumos_i3d_reproduce/logs
 ```
-* Evaluate the trained model. The expected average mAP should be around 62.6(%) as in Table 1 of our main paper.
+* Evaluate the trained model. The expected average mAP should be around 62.6(%) as in Table 1 of our main paper. **With recent commits, the expected average mAP should be higher than 66.0(%)**.
 ```shell
 python ./eval.py ./configs/thumos_i3d.yaml ./ckpt/thumos_i3d_reproduce
 ```
