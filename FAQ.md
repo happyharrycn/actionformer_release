@@ -36,7 +36,11 @@ Namely, 0.0 and 1.0 on the feature grids correspond to frame index 1.5 and 3.5, 
 
 **Q:** Why masking out action instances with label ID 4 when training on THUMOS14?
 
-**A:**  In THUMOS14 dataset, the action category "Cliff Diving" (ID: 4) is a subset of the category "Diving" (ID: 7). Namely, all "Cliff Diving" instances are also annotated as "Diving", yet not all "Diving" instances are marked as "Cliff Diving". This brings an issue for the implementation of label assignment during training. Specifically, our current implementation assumes that a moment can be matched to at most one ground truth (GT) action instance, and thus could not handle the case where there are two GT action instances with exactly the same temporal boundaries (yet different labels).
+**A:** This is no longer needed in the code.
+##
 
-Our solution, somewhat hacky, is to remove all instances from the action category "Cliff Diving" during training by masking out those instances. Note that (1) all instances from "Diving" still remain; and (2) this is only done during training. At test time, our model is still evaluated on all categories. The downside of this solution is that our model will not be able to recognize "Cliff Diving" on the test set, as it never saw an training sample from this category. Part of this discrepancy is resolved by fusing external classification scores. To verify this, you can disable score fusion and print the mAP scores per category, and the mAP for "Cliff Diving" (ID: 4) should be close to 0.
+**Q:** How to use I3D models to extract video features?
+
+**A:** We refer to [this repo](https://github.com/Finspire13/pytorch-i3d-feature-extraction) for extracting video features using I3D models.
+
 ##

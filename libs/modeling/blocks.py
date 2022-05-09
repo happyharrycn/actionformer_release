@@ -716,9 +716,9 @@ class TransformerBlock(nn.Module):
         self.mlp = nn.Sequential(
             nn.Conv1d(n_embd, n_hidden, 1),
             act_layer(),
-            nn.Dropout(proj_pdrop),
+            nn.Dropout(proj_pdrop, inplace=True),
             nn.Conv1d(n_hidden, n_out, 1),
-            nn.Dropout(proj_pdrop),
+            nn.Dropout(proj_pdrop, inplace=True),
         )
 
         # drop path
