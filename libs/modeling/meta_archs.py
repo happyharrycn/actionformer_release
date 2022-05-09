@@ -6,7 +6,7 @@ from torch.nn import functional as F
 
 from .models import register_meta_arch, make_backbone, make_neck, make_generator
 from .blocks import MaskedConv1D, Scale, LayerNorm
-from .losses import ctr_giou_loss_1d, sigmoid_focal_loss
+from .losses import ctr_diou_loss_1d, sigmoid_focal_loss
 
 from ..utils import batched_nms
 
@@ -186,6 +186,7 @@ class PtTransformer(nn.Module):
         fpn_with_ln,           # if to apply layer norm at the end of fpn
         head_dim,              # feature dim for head
         regression_range,      # regression range on each level of FPN
+        head_num_layers,       # number of layers in the head (including the classifier)
         head_kernel_size,      # kernel size for reg/cls heads
         head_with_ln,          # attache layernorm to reg/cls heads
         use_abs_pe,            # if to use abs position encoding
@@ -307,11 +308,13 @@ class PtTransformer(nn.Module):
             kernel_size=head_kernel_size,
             prior_prob=self.train_cls_prior_prob,
             with_ln=head_with_ln,
+            num_layers=head_num_layers,
             empty_cls=train_cfg['head_empty_cls']
         )
         self.reg_head = PtTransformerRegHead(
             fpn_dim, head_dim, len(self.fpn_strides),
             kernel_size=head_kernel_size,
+            num_layers=head_num_layers,
             with_ln=head_with_ln
         )
 
@@ -572,7 +575,7 @@ class PtTransformer(nn.Module):
             reg_loss = 0 * pred_offsets.sum()
         else:
             # giou loss defined on positive samples
-            reg_loss = ctr_giou_loss_1d(
+            reg_loss = ctr_diou_loss_1d(
                 pred_offsets,
                 gt_offsets,
                 reduction='sum'

@@ -38,13 +38,13 @@ class FPN1D(nn.Module):
         self.fpn_convs = nn.ModuleList()
         self.fpn_norms = nn.ModuleList()
         for i in range(self.start_level, self.end_level):
-            # disable bias for all convs here
+            # disable bias if using layer norm
             l_conv = MaskedConv1D(
-                in_channels[i], out_channel, 1, bias=False)
+                in_channels[i], out_channel, 1, bias=(not with_ln))
             # use depthwise conv here for efficiency
             fpn_conv = MaskedConv1D(
                 out_channel, out_channel, 3,
-                padding=1, bias=False, groups=out_channel
+                padding=1, bias=(not with_ln), groups=out_channel
             )
             # layer norm for order (B C T)
             if with_ln:

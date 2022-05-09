@@ -157,7 +157,7 @@ def ctr_diou_loss_1d(
     # offset between centers
     rho = 0.5 * (rp - lp - rg + lg)
 
-    # giou is reduced to iou in our setting, skip unnecessary steps
+    # diou
     loss = 1.0 - iouk + torch.square(rho / len_c.clamp(min=eps))
 
     if reduction == "mean":

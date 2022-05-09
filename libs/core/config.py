@@ -67,6 +67,8 @@ DEFAULTS = {
         "head_dim": 512,
         # kernel size for reg/cls/center heads
         "head_kernel_size": 3,
+        # number of layers in the head (including the final one)
+        "head_num_layers": 3,
         # if attach group norm to heads
         "head_with_ln": True,
         # defines the max length of the buffered points
@@ -88,7 +90,7 @@ DEFAULTS = {
         # cls head without data (a fix to epic-kitchens / thumos)
         "head_empty_cls": [],
         # dropout ratios for tranformers
-        "dropout": 0.1,
+        "dropout": 0.0,
         # ratio for drop path
         "droppath": 0.1,
         # if to use label smoothing (>0.0)
