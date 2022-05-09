@@ -1,13 +1,16 @@
 # ActionFormer: Localizing Moments of Actions with Transformers
 
 ## Introduction
-This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 65.6% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 8.7 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.0% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our tech report can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
+This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 65.6% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 8.7 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.0% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). An earlier version of our tech report can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
 
 <div align="center">
   <img src="teaser.jpg" width="600px"/>
 </div>
 
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
+
+## Changelog
+* 05/08/2021: We have updated the code repo based on the community feedback and our code review, leading to significantly better mAP (>66.0%) on THUMOS14 and minorly improved results on ActivityNet and EPIC-Kitchens 100. We will update the pre-trained models and our tech report shortly.
 
 
 ## Code Overview
@@ -90,6 +93,7 @@ This folder
 * The training config is recorded in *./pretrained/thumos_i3d_reproduce/config.txt*.
 * The training log is located at *./pretrained/thumos_i3d_reproduce/thumos_reproduce_log.txt* and also *./pretrained/thumos_i3d_reproduce/logs*.
 * The pre-trained model is *./pretrained/thumos_i3d_reproduce/epoch_049.pth.tar*.
+* If you are using the latest code, uncomment L47-48 and comment out L50 in *./configs/thumos_i3d.yaml* (to enable score fusion).
 * Evaluate the pre-trained model.
 ```shell
 python ./eval.py ./configs/thumos_i3d.yaml ./pretrained/thumos_i3d_reproduce/
