@@ -10,6 +10,8 @@ This code repo implements Actionformer, one of the first Transformer-based model
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
 ## Changelog
+* 05/09/2022: Pre-trained models have been updated. 
+
 * 05/08/2022: We have updated the code repo based on the community feedback and our code review, leading to significantly better average mAP on THUMOS14 (>66.0%) and slightly improved results on ActivityNet and EPIC-Kitchens 100. We will update the pre-trained models and the tech report shortly.
 
 
@@ -70,7 +72,7 @@ python ./eval.py ./configs/thumos_i3d.yaml ./ckpt/thumos_i3d_reproduce
 
 **[Optional] Evaluating Our Pre-trained Model**
 
-We also provide a pre-trained model for THUMOS 14. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1zoijW_NlPXzDHrkvr3jEdqn7-hxv0yv-/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
+We also provide a pre-trained model for THUMOS 14. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1isG3bc1dG5-llBRFCivJwz_7c_b0XDcY/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
 
 * Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
 * The folder structure should look like
@@ -92,8 +94,7 @@ This folder
 ```
 * The training config is recorded in *./pretrained/thumos_i3d_reproduce/config.txt*.
 * The training log is located at *./pretrained/thumos_i3d_reproduce/thumos_reproduce_log.txt* and also *./pretrained/thumos_i3d_reproduce/logs*.
-* The pre-trained model is *./pretrained/thumos_i3d_reproduce/epoch_049.pth.tar*.
-* If you are using the latest code, uncomment L47-48 and comment out L50 in *./configs/thumos_i3d.yaml* (to enable score fusion).
+* The pre-trained model is *./pretrained/thumos_i3d_reproduce/epoch_034.pth.tar*.
 * Evaluate the pre-trained model.
 ```shell
 python ./eval.py ./configs/thumos_i3d.yaml ./pretrained/thumos_i3d_reproduce/
@@ -102,7 +103,7 @@ python ./eval.py ./configs/thumos_i3d.yaml ./pretrained/thumos_i3d_reproduce/
 
 | Method            |  0.3  |  0.4  |  0.5  |  0.6  |  0.7  |  Avg  |
 |-------------------|-------|-------|-------|-------|-------|-------|
-| ActionFormer      | 75.49 | 72.48 | 65.60 | 56.56 | 42.72 | 62.57 |
+| ActionFormer      | 82.13 | 77.80 | 70.95 | 59.40 | 43.87 | 66.83 |
 
 
 ## To Reproduce Our Results on ActivityNet 1.3
@@ -148,7 +149,7 @@ python ./eval.py ./configs/anet_tsp.yaml ./ckpt/anet_tsp_reproduce
 
 **[Optional] Evaluating Our Pre-trained Model**
 
-We also provide a pre-trained model for ActivityNet 1.3. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1BKfCXw-YdLvxmiABPPm3A6D6K8_MCkWY/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
+We also provide a pre-trained model for ActivityNet 1.3. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1UgWGXeTTPQn_tnw92aB2VF08bqak7j-W/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
 
 * Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
 * The folder structure should look like
@@ -179,7 +180,7 @@ python ./eval.py ./configs/anet_tsp.yaml ./pretrained/anet_tsp_reproduce/
 
 | Method            |  0.5  |  0.75 |  0.95 |  Avg  |
 |-------------------|-------|-------|-------|-------|
-| ActionFormer      | 54.28 | 37.30 |  7.87 | 36.06 |
+| ActionFormer      | 54.34 | 37.22 |  7.79 | 36.06 |
 
 
 ## To Reproduce Our Results on EPIC Kitchens 100
@@ -230,7 +231,7 @@ python ./eval.py ./configs/epic_slowfast_noun.yaml ./ckpt/epic_slowfast_noun_rep
 
 **[Optional] Evaluating Our Pre-trained Model**
 
-We also provide a pre-trained model for EPIC-Kitchens 100. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1soUXMt0Vnf-b4vIivKEtyEyZijRccSJ0/view?usp=sharing) (verb), and from this [Google Drive link](https://drive.google.com/file/d/1aOYz2kEUJNJJo387kCOQCkdAvk0Hmi9f/view?usp=sharing) (noun). To evaluate the pre-trained model, please follow the steps listed below.
+We also provide a pre-trained model for EPIC-Kitchens 100. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1Ta4ggKSj2YcszSrDbePlHe1ECF1CFKK4/view?usp=sharing) (verb), and from this [Google Drive link](https://drive.google.com/file/d/1OTlxeiWj8JE9n1-LsRYogHmqgUdsE5PR/view?usp=sharing) (noun). To evaluate the pre-trained model, please follow the steps listed below.
 
 * Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
 * The folder structure should look like
@@ -256,7 +257,7 @@ This folder
 ```
 * The training config is recorded in *./pretrained/epic_slowfast_(verb|noun)_reproduce/config.txt*.
 * The training log is located at *./pretrained/epic_slowfast_(verb|noun)_reproduce/epic_slowfast_(verb|noun)_reproduce_log.txt* and also *./pretrained/epic_slowfast_(verb|noun)_reproduce/logs*.
-* The pre-trained model is *./pretrained/epic_slowfast_(verb|noun)_reproduce/epoch_(029|034).pth.tar*.
+* The pre-trained model is *./pretrained/epic_slowfast_(verb|noun)_reproduce/epoch_(020|020).pth.tar*.
 * Evaluate the pre-trained model for verbs.
 ```shell
 python ./eval.py ./configs/epic_slowfast_verb.yaml ./pretrained/epic_slowfast_verb_reproduce/
@@ -269,8 +270,8 @@ python ./eval.py ./configs/epic_slowfast_noun.yaml ./pretrained/epic_slowfast_no
 
 | Method              |  0.1  |  0.2  |  0.3  |  0.4  |  0.5  |  Avg  |
 |---------------------|-------|-------|-------|-------|-------|-------|
-| ActionFormer (verb) | 26.55 | 25.58 | 24.39 | 22.39 | 18.27 | 23.44 |
-| ActionFormer (noun) | 25.51 | 24.26 | 22.60 | 20.28 | 16.59 | 21.85 |
+| ActionFormer (verb) | 26.58 | 25.42 | 24.15 | 22.29 | 19.09 | 23.51 |
+| ActionFormer (noun) | 25.21 | 24.11 | 22.66 | 20.47 | 16.97 | 21.88 |
 
 
 ## Training and Evaluating Your Own Dataset
