@@ -75,7 +75,7 @@ class EpicKitchensDataset(Dataset):
 
     def find_empty_cls(self, label_dict, num_classes):
         # find categories with out a data sample
-        if label_dict == num_classes:
+        if len(label_dict) == num_classes:
             return []
         empty_label_ids = []
         label_ids = [v for _, v in label_dict.items()]
