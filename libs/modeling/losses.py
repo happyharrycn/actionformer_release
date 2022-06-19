@@ -22,7 +22,7 @@ def sigmoid_focal_loss(
                  classification label for each element in inputs
                 (0 for the negative class and 1 for the positive class).
         alpha: (optional) Weighting factor in range (0,1) to balance
-                positive vs negative examples. Default = 0.25 (no weighting).
+                positive vs negative examples. Default = 0.25.
         gamma: Exponent of the modulating factor (1 - p_t) to
                balance easy vs hard examples.
         reduction: 'none' | 'mean' | 'sum'

@@ -63,6 +63,8 @@ DEFAULTS = {
         "fpn_dim": 512,
         # if add ln at the end of fpn outputs
         "fpn_with_ln": True,
+        # starting level for fpn
+        "fpn_start_level": 0,
         # feat dim for head
         "head_dim": 512,
         # kernel size for reg/cls/center heads

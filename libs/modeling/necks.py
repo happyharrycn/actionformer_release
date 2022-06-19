@@ -81,13 +81,15 @@ class FPN1D(nn.Module):
         # fpn conv / norm -> outputs
         # mask will remain the same
         fpn_feats = tuple()
+        new_fpn_masks = tuple()
         for i in range(used_backbone_levels):
-            x, _ = self.fpn_convs[i](
+            x, new_mask = self.fpn_convs[i](
                 laterals[i], fpn_masks[i + self.start_level])
             x = self.fpn_norms[i](x)
             fpn_feats += (x, )
+            new_fpn_masks += (new_mask, )
 
-        return fpn_feats, fpn_masks
+        return fpn_feats, new_fpn_masks
 
 @register_neck('identity')
 class FPNIdentity(nn.Module):
@@ -117,7 +119,7 @@ class FPNIdentity(nn.Module):
         self.fpn_norms = nn.ModuleList()
         for i in range(self.start_level, self.end_level):
             # check feat dims
-            assert self.in_channels[i + self.start_level] == self.out_channel
+            assert self.in_channels[i] == self.out_channel
             # layer norm for order (B C T)
             if with_ln:
                 fpn_norm = LayerNorm(out_channel)
@@ -132,8 +134,10 @@ class FPNIdentity(nn.Module):
 
         # apply norms, fpn_masks will remain the same with 1x1 convs
         fpn_feats = tuple()
+        new_fpn_masks = tuple()
         for i in range(len(self.fpn_norms)):
             x = self.fpn_norms[i](inputs[i + self.start_level])
             fpn_feats += (x, )
+            new_fpn_masks += (fpn_masks[i + self.start_level], )
 
-        return fpn_feats, fpn_masks
+        return fpn_feats, new_fpn_masks

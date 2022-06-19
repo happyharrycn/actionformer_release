@@ -34,20 +34,19 @@ class PointGenerator(nn.Module):
     def __init__(
         self,
         max_seq_len,        # max sequence length that the generator will buffer
-        fpn_levels,         # number of fpn levels
-        scale_factor,       # scale factor between two fpn levels
+        fpn_strides,        # strides of fpn levels
         regression_range,   # regression range (on feature grids)
         use_offset=False    # if to align the points at grid centers
     ):
         super().__init__()
         # sanity check, # fpn levels and length divisible
+        fpn_levels = len(fpn_strides)
         assert len(regression_range) == fpn_levels
-        assert max_seq_len % scale_factor**(fpn_levels - 1) == 0
 
         # save params
         self.max_seq_len = max_seq_len
         self.fpn_levels = fpn_levels
-        self.scale_factor = scale_factor
+        self.fpn_strides = fpn_strides
         self.regression_range = regression_range
         self.use_offset = use_offset
 
@@ -57,8 +56,7 @@ class PointGenerator(nn.Module):
     def _generate_points(self):
         points_list = []
         # loop over all points at each pyramid level
-        for l in range(self.fpn_levels):
-            stride = self.scale_factor ** l
+        for l, stride in enumerate(self.fpn_strides):
             reg_range = torch.as_tensor(
                 self.regression_range[l], dtype=torch.float)
             fpn_stride = torch.as_tensor(stride, dtype=torch.float)

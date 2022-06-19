@@ -184,6 +184,7 @@ class PtTransformer(nn.Module):
         embd_with_ln,          # attach layernorm to embedding network
         fpn_dim,               # feature dim on FPN
         fpn_with_ln,           # if to apply layer norm at the end of fpn
+        fpn_start_level,       # start level of fpn
         head_dim,              # feature dim for head
         regression_range,      # regression range on each level of FPN
         head_num_layers,       # number of layers in the head (including the classifier)
@@ -197,7 +198,9 @@ class PtTransformer(nn.Module):
     ):
         super().__init__()
         # re-distribute params to backbone / neck / head
-        self.fpn_strides = [scale_factor**i for i in range(backbone_arch[-1]+1)]
+        self.fpn_strides = [scale_factor**i for i in range(
+            fpn_start_level, backbone_arch[-1]+1
+        )]
         self.reg_range = regression_range
         assert len(self.fpn_strides) == len(self.reg_range)
         self.scale_factor = scale_factor
@@ -208,9 +211,9 @@ class PtTransformer(nn.Module):
         # check the feature pyramid and local attention window size
         self.max_seq_len = max_seq_len
         if isinstance(n_mha_win_size, int):
-            self.mha_win_size = [n_mha_win_size]*len(self.fpn_strides)
+            self.mha_win_size = [n_mha_win_size]*(1 + backbone_arch[-1])
         else:
-            assert len(n_mha_win_size) == len(self.fpn_strides)
+            assert len(n_mha_win_size) == (1 + backbone_arch[-1])
             self.mha_win_size = n_mha_win_size
         max_div_factor = 1
         for l, (s, w) in enumerate(zip(self.fpn_strides, self.mha_win_size)):
@@ -287,6 +290,7 @@ class PtTransformer(nn.Module):
                 'in_channels' : [embd_dim] * (backbone_arch[-1] + 1),
                 'out_channel' : fpn_dim,
                 'scale_factor' : scale_factor,
+                'start_level' : fpn_start_level,
                 'with_ln' : fpn_with_ln
             }
         )
@@ -296,8 +300,7 @@ class PtTransformer(nn.Module):
             'point',
             **{
                 'max_seq_len' : max_seq_len * max_buffer_len_factor,
-                'fpn_levels' : len(self.fpn_strides),
-                'scale_factor' : scale_factor,
+                'fpn_strides' : self.fpn_strides,
                 'regression_range' : self.reg_range
             }
         )
