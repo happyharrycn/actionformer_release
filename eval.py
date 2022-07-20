@@ -70,7 +70,6 @@ def main(args):
     model.load_state_dict(checkpoint['state_dict_ema'])
     del checkpoint
 
-
     # set up evaluator
     det_eval, output_file = None, None
     if not args.saveonly:
