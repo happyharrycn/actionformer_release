@@ -13,12 +13,15 @@ dataset: {
   default_fps: 15,
   trunc_thresh: 0.5,
   crop_ratio: [0.9, 1.0],
-  max_seq_len: 768,
+  # upsample the features to a fixed length of 192
+  max_seq_len: 192,
+  force_upsampling: True,
 }
 model: {
   fpn_type: identity,
   max_buffer_len_factor: 1.0,
-  n_mha_win_size: [25, 25, 25, 25, 25, -1],
+  # 192 - 96 - 48 - 24 - 12 - 6
+  n_mha_win_size: [7, 7, 7, 7, 7, -1],
   # shrink the model for reduced input feature channels
   n_head: 4,
   embd_dim: 256,
@@ -35,12 +38,14 @@ loader: {
   batch_size: 16,
 }
 train_cfg: {
-  init_loss_norm: 400,
+  init_loss_norm: 200,
   clip_grad_l2norm: 1.0,
   cls_prior_prob: 0.01,
   center_sample: radius,
   center_sample_radius: 1.5,
   label_smoothing: 0.1,
+  droppath: 0.1,
+  loss_weight: 2.0,
 }
 
 # similar to THUMOS
@@ -54,6 +59,6 @@ test_cfg: {
   multiclass_nms: False,
   nms_sigma : 0.75,
   ext_score_file: ./data/anet_1.3/annotations/cuhk_val_simp_share.json,
-  duration_thresh: 0.1,
+  duration_thresh: 0.001,
 }
 output_folder: ./ckpt/
