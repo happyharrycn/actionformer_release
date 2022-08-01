@@ -1,7 +1,7 @@
 # ActionFormer: Localizing Moments of Actions with Transformers
 
 ## Introduction
-This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves ~~65.6%~~ 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by ~~8.7~~ 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.0% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). An earlier version of our tech report can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
+This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). An earlier version of our tech report can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
 
 <div align="center">
   <img src="teaser.jpg" width="600px"/>
@@ -10,6 +10,10 @@ This code repo implements Actionformer, one of the first Transformer-based model
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
 ## Changelog
+* 08/01/2022: Updated code repo with latest results on ActivityNet.
+
+* 07/08/2022: The paper is accepted to ECCV 2022.
+
 * 05/09/2022: Pre-trained models have been updated.
 
 * 05/08/2022: We have updated the code repo based on the community feedback and our code review, leading to significantly better average mAP on THUMOS14 (>66.0%) and slightly improved results on ActivityNet and EPIC-Kitchens 100. We will update ~~the pre-trained models and~~ the tech report shortly.
@@ -141,7 +145,7 @@ python ./train.py ./configs/anet_tsp.yaml --output reproduce
 ```shell
 tensorboard --logdir=./ckpt/anet_tsp_reproduce/logs
 ```
-* Evaluate the trained model. The expected average mAP should be around 36.0(%) as in Table 1 of our main paper.
+* Evaluate the trained model. The expected average mAP should be around 36.5(%) as in Table 1 of our main paper.
 ```shell
 python ./eval.py ./configs/anet_tsp.yaml ./ckpt/anet_tsp_reproduce
 ```
@@ -149,7 +153,7 @@ python ./eval.py ./configs/anet_tsp.yaml ./ckpt/anet_tsp_reproduce
 
 **[Optional] Evaluating Our Pre-trained Model**
 
-We also provide a pre-trained model for ActivityNet 1.3. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1UgWGXeTTPQn_tnw92aB2VF08bqak7j-W/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
+We also provide a pre-trained model for ActivityNet 1.3. The model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/1JKh3w14ngAjgzuuP22BnjhkhIcBSqteJ/view?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
 
 * Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
 * The folder structure should look like
@@ -180,7 +184,7 @@ python ./eval.py ./configs/anet_tsp.yaml ./pretrained/anet_tsp_reproduce/
 
 | Method            |  0.5  |  0.75 |  0.95 |  Avg  |
 |-------------------|-------|-------|-------|-------|
-| ActionFormer      | 54.34 | 37.22 |  7.79 | 36.06 |
+| ActionFormer      | 54.67 | 37.81 |  8.36 | 36.56 |
 
 
 ## To Reproduce Our Results on EPIC Kitchens 100
