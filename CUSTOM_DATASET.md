@@ -38,12 +38,12 @@ We provide a step-by-step tutorial on how to train your custom dataset with Acti
          {"subset": "Training", "duration": 33.83, "fps": 30.0, "annotations":
             [
                {
-                  "label": label1,
+                  "label": "label1",
                   "segment": [0.3, 1.1],
                   "label_id": 5
                },
                {
-                  "label": label2,
+                  "label": "label2",
                   "segment": [2.2, 3.3],
                   "label_id": 5
                },
