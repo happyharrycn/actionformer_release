@@ -1,7 +1,7 @@
 # ActionFormer: Localizing Moments of Actions with Transformers
 
 ## Introduction
-This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). An earlier version of our tech report can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
+This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our paper was accepted to ECCV 2022 and an arXiv version can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
 
 <div align="center">
   <img src="teaser.jpg" width="600px"/>
@@ -10,13 +10,15 @@ This code repo implements Actionformer, one of the first Transformer-based model
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
 ## Changelog
+* 08/29/2022: Updated arXiv version.
+
 * 08/01/2022: Updated code repo with latest results on ActivityNet.
 
 * 07/08/2022: The paper is accepted to ECCV 2022.
 
 * 05/09/2022: Pre-trained models have been updated.
 
-* 05/08/2022: We have updated the code repo based on the community feedback and our code review, leading to significantly better average mAP on THUMOS14 (>66.0%) and slightly improved results on ActivityNet and EPIC-Kitchens 100. We will update ~~the pre-trained models and~~ the tech report shortly.
+* 05/08/2022: We have updated the code repo based on the community feedback and our code review, leading to significantly better average mAP on THUMOS14 (>66.0%) and slightly improved results on ActivityNet and EPIC-Kitchens 100.
 
 
 ## Code Overview
