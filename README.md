@@ -289,10 +289,10 @@ Yin Li (yin.li@wisc.edu)
 ## References
 If you are using our code, please consider citing our paper.
 ```
-@article{zhang2022actionformer,
+@inproceedings{zhang2022actionformer,
   title={ActionFormer: Localizing Moments of Actions with Transformers},
   author={Zhang, Chenlin and Wu, Jianxin and Li, Yin},
-  journal={arXiv preprint arXiv:2202.07925},
+  booktitle={European Conference on Computer Vision},
   year={2022}
 }
 ```
