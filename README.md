@@ -1,7 +1,7 @@
 # ActionFormer: Localizing Moments of Actions with Transformers
 
 ## Introduction
-This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our paper was accepted to ECCV 2022 and an arXiv version can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
+This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our paper is accepted to ECCV 2022 and an arXiv version can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
 
 <div align="center">
   <img src="teaser.jpg" width="600px"/>
@@ -62,7 +62,7 @@ This folder
 ```
 
 **Training and Evaluation**
-* Train our ActionFormer with I3D features. This will create a experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
+* Train our ActionFormer with I3D features. This will create an experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
 ```shell
 python ./train.py ./configs/thumos_i3d.yaml --output reproduce
 ```
@@ -139,7 +139,7 @@ This folder
 ```
 
 **Training and Evaluation**
-* Train our ActionFormer with TSP features. This will create a experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
+* Train our ActionFormer with TSP features. This will create an experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
 ```shell
 python ./train.py ./configs/anet_tsp.yaml --output reproduce
 ```
