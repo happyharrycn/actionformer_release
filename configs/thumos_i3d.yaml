@@ -35,9 +35,6 @@ train_cfg: {
   center_sample: radius,
   center_sample_radius: 1.5,
 }
-# the inference on THUMOS is quite different from EPIC-kitchens
-# a major performance gain is achieved by fusing external classification scores
-# doing so will require disable multiclass_nms and enable score fusion
 test_cfg: {
   voting_thresh: 0.7,
   pre_nms_topk: 2000,

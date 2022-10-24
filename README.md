@@ -189,6 +189,35 @@ python ./eval.py ./configs/anet_tsp.yaml ./pretrained/anet_tsp_reproduce/
 | ActionFormer      | 54.67 | 37.81 |  8.36 | 36.56 |
 
 
+**[Optional] Reproducing Our Results with I3D Features**
+
+* Download *anet_1.3_i3d.tar.gz* (`md5sum e649425954e0123401650312dd0d56a7`) from [this Google Drive Link](https://drive.google.com/file/d/16239kUT2Z-j6S6PXIT1b_31OJi35QW_o/view?usp=sharing).
+
+**Details**: The features are extracted from the I3D model pretrained on Kinetics using clips of `16 frames` at a frame rate of `25 fps` and a stride of `16 frames`. This gives one feature vector per `16/25 = 0.64` seconds. The features are converted into numpy files for our code.
+
+* Unpack the file under *./data* (or elsewhere and link to *./data*), similar to TSP features.
+
+* Train our ActionFormer with I3D features. This will create an experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
+```shell
+python ./train.py ./configs/anet_i3d.yaml --output reproduce
+```
+
+* Evaluate the trained model. The expected average mAP should be around 36.0(%). This is slightly improved from our paper. The improvement is produced by better training scheme / hyperparameters (see comments in the config file).
+```shell
+python ./eval.py ./configs/anet_i3d.yaml ./ckpt/anet_tsp_reproduce
+```
+
+* The pre-trained model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/152dw2JDoNPssSnaQDaNolQUSFgcHlxe3/view?usp=sharing). To produce the results, create a folder *./pretrained*, unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*), and run
+```shell
+python ./eval.py ./configs/anet_i3d.yaml ./pretrained/anet_i3d_reproduce/
+```
+
+* The results (mAP at tIoUs) with I3D features should be
+
+| Method            |  0.5  |  0.75 |  0.95 |  Avg  |
+|-------------------|-------|-------|-------|-------|
+| ActionFormer      | 54.29 | 36.71 |  8.24 | 36.03 |
+
 ## To Reproduce Our Results on EPIC Kitchens 100
 **Download Features and Annotations**
 * Download *epic_kitchens.tar.gz* (`md5sum add9803756afd9a023bc9a9c547e0229`) from [this Box link](https://uwmadison.box.com/s/vdha47qnce6jhqktz9g4mq1gc40w82yj) or [this Google Drive Link](https://drive.google.com/file/d/1Z4U_dLuu6_cV5NBIrSzsSDOOj2Uar85X/view?usp=sharing) or [this BaiduYun Link](https://pan.baidu.com/s/15tOdX6Yp4AJ9lFGjbQ8dgg?pwd=f3tx).
