@@ -11,11 +11,14 @@ from typing import Dict
 
 
 def remove_duplicate_annotations(ants, tol=1e-3):
-    # remove duplicate annotations (same category and starting/ending time)
+    # remove duplicate / very short annotations (same category and starting/ending time)
     valid_events = []
     for event in ants:
         s, e, l = event['segment'][0], event['segment'][1], event['label_id']
-        valid = True
+        if (e - s) >= tol:
+            valid = True
+        else:
+            valid = False
         for p_event in valid_events:
             if ((abs(s-p_event['segment'][0]) <= tol)
                 and (abs(e-p_event['segment'][1]) <= tol)
