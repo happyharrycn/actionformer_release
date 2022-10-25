@@ -204,7 +204,7 @@ python ./train.py ./configs/anet_i3d.yaml --output reproduce
 
 * Evaluate the trained model. The expected average mAP should be around 36.0(%). This is slightly improved from our paper. The improvement is produced by better training scheme / hyperparameters (see comments in the config file).
 ```shell
-python ./eval.py ./configs/anet_i3d.yaml ./ckpt/anet_tsp_reproduce
+python ./eval.py ./configs/anet_i3d.yaml ./ckpt/anet_i3d_reproduce
 ```
 
 * The pre-trained model with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/file/d/152dw2JDoNPssSnaQDaNolQUSFgcHlxe3/view?usp=sharing). To produce the results, create a folder *./pretrained*, unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*), and run
