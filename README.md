@@ -320,7 +320,7 @@ If you are using our code, please consider citing our paper.
 ```
 @inproceedings{zhang2022actionformer,
   title={ActionFormer: Localizing Moments of Actions with Transformers},
-  author={Zhang, Chenlin and Wu, Jianxin and Li, Yin},
+  author={Zhang, Chen-Lin and Wu, Jianxin and Li, Yin},
   booktitle={European Conference on Computer Vision},
   year={2022}
 }
