@@ -183,6 +183,7 @@ class ActivityNetDataset(Dataset):
             feat_stride = video_item['duration'] * video_item['fps'] / seq_len
             # center the features
             num_frames = feat_stride
+        feat_offset = 0.5 * num_frames / feat_stride
 
         # T x C -> C x T
         feats = torch.from_numpy(np.ascontiguousarray(feats.transpose()))
@@ -201,13 +202,13 @@ class ActivityNetDataset(Dataset):
         # ok to have small negative values here
         if video_item['segments'] is not None:
             segments = torch.from_numpy(
-                (video_item['segments'] * video_item['fps'] - 0.5 * num_frames) / feat_stride
+                video_item['segments'] * video_item['fps'] / feat_stride - feat_offset
             )
             labels = torch.from_numpy(video_item['labels'])
             # for activity net, we have a few videos with a bunch of missing frames
             # here is a quick fix for training
             if self.is_training:
-                vid_len = feats.shape[1] + 0.5 * num_frames / feat_stride
+                vid_len = feats.shape[1] + feat_offset
                 valid_seg_list, valid_label_list = [], []
                 for seg, label in zip(segments, labels):
                     if seg[0] >= vid_len:
@@ -241,7 +242,7 @@ class ActivityNetDataset(Dataset):
         # truncate the features during training
         if self.is_training and (segments is not None):
             data_dict = truncate_feats(
-                data_dict, self.max_seq_len, self.trunc_thresh, self.crop_ratio
+                data_dict, self.max_seq_len, self.trunc_thresh, feat_offset, self.crop_ratio
             )
 
         return data_dict

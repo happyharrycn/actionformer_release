@@ -25,6 +25,7 @@ def truncate_feats(
     data_dict,
     max_seq_len,
     trunc_thresh,
+    offset,
     crop_ratio=None,
     max_num_trials=200,
     has_action=True,
@@ -74,8 +75,8 @@ def truncate_feats(
 
         # compute the intersection between the sampled window and all segments
         window = window[None].repeat(num_segs, 1)
-        left = torch.maximum(window[:, 0], data_dict['segments'][:, 0])
-        right = torch.minimum(window[:, 1], data_dict['segments'][:, 1])
+        left = torch.maximum(window[:, 0] - offset, data_dict['segments'][:, 0])
+        right = torch.minimum(window[:, 1] + offset, data_dict['segments'][:, 1])
         inter = (right - left).clamp(min=0)
         area_segs = torch.abs(
             data_dict['segments'][:, 1] - data_dict['segments'][:, 0])

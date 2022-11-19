@@ -9,8 +9,8 @@ from torch.nn import functional as F
 from .datasets import register_dataset
 from .data_utils import truncate_feats
 
-@register_dataset("epic")
-class EpicKitchensDataset(Dataset):
+@register_dataset("ego4d")
+class EGO4DDataset(Dataset):
     def __init__(
         self,
         is_training,     # if in training mode
@@ -31,7 +31,10 @@ class EpicKitchensDataset(Dataset):
         force_upsampling # force to upsample to max_seq_len
     ):
         # file path
-        assert os.path.exists(feat_folder) and os.path.exists(json_file)
+        if not isinstance(feat_folder, (list, tuple)):
+            feat_folder = (feat_folder, )
+        assert all([os.path.exists(folder) for folder in feat_folder])
+        assert os.path.exists(json_file)
         assert isinstance(split, tuple) or isinstance(split, list)
         assert crop_ratio == None or len(crop_ratio) == 2
         self.feat_folder = feat_folder
@@ -60,29 +63,16 @@ class EpicKitchensDataset(Dataset):
 
         # load database and select the subset
         dict_db, label_dict = self._load_json_db(self.json_file)
-        # "empty" noun categories on epic-kitchens
-        assert len(label_dict) <= num_classes
+        assert len(label_dict) == num_classes
         self.data_list = dict_db
         self.label_dict = label_dict
 
         # dataset specific attributes
-        empty_label_ids = self.find_empty_cls(label_dict, num_classes)
         self.db_attributes = {
-            'dataset_name': 'epic-kitchens-100',
+            'dataset_name': 'ego4d',
             'tiou_thresholds': np.linspace(0.1, 0.5, 5),
-            'empty_label_ids': empty_label_ids
+            'empty_label_ids': []
         }
-
-    def find_empty_cls(self, label_dict, num_classes):
-        # find categories with out a data sample
-        if len(label_dict) == num_classes:
-            return []
-        empty_label_ids = []
-        label_ids = [v for _, v in label_dict.items()]
-        for id in range(num_classes):
-            if id not in label_ids:
-                empty_label_ids.append(id)
-        return empty_label_ids
 
     def get_attributes(self):
         return self.db_attributes
@@ -97,6 +87,8 @@ class EpicKitchensDataset(Dataset):
         if self.label_dict is None:
             label_dict = {}
             for key, value in json_db.items():
+                if 'annotations' not in value:
+                    continue
                 for act in value['annotations']:
                     label_dict[act['label']] = act['label_id']
 
@@ -105,6 +97,12 @@ class EpicKitchensDataset(Dataset):
         for key, value in json_db.items():
             # skip the video if not in the split
             if value['subset'].lower() not in self.split:
+                continue
+            # or does not have the feature file
+            feat_files = [os.path.join(
+                folder, self.file_prefix + key + self.file_ext
+            ) for folder in self.feat_folder]
+            if not all([os.path.exists(file) for file in feat_files]):
                 continue
 
             # get fps if available
@@ -133,11 +131,13 @@ class EpicKitchensDataset(Dataset):
             else:
                 segments = None
                 labels = None
+
             dict_db += ({'id': key,
                          'fps' : fps,
                          'duration' : duration,
                          'segments' : segments,
-                         'labels' : labels
+                         'labels' : labels,
+                         'offset': value.get('offset'), # only for test
             }, )
 
         return dict_db, label_dict
@@ -152,10 +152,12 @@ class EpicKitchensDataset(Dataset):
         video_item = self.data_list[idx]
 
         # load features
-        filename = os.path.join(self.feat_folder,
-                                self.file_prefix + video_item['id'] + self.file_ext)
-        with np.load(filename) as data:
-            feats = data['feats'].astype(np.float32)
+        filenames = [os.path.join(
+            folder, self.file_prefix + video_item['id'] + self.file_ext
+        ) for folder in self.feat_folder]
+        feats = np.concatenate(
+            [np.load(name).astype(np.float32) for name in filenames], axis=1
+        )
 
         # deal with downsampling (= increased feat stride)
         feats = feats[::self.downsample_rate, :]
@@ -182,7 +184,9 @@ class EpicKitchensDataset(Dataset):
                      'fps'             : video_item['fps'],
                      'duration'        : video_item['duration'],
                      'feat_stride'     : feat_stride,
-                     'feat_num_frames' : self.num_frames}
+                     'feat_num_frames' : self.num_frames,
+                     'offset'          : video_item['offset'],
+        }
 
         # truncate the features during training
         if self.is_training and (segments is not None):

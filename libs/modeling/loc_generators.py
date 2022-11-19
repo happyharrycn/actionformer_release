@@ -28,7 +28,7 @@ class BufferList(nn.Module):
 class PointGenerator(nn.Module):
     """
         A generator for temporal "points"
-
+        
         max_seq_len can be much larger than the actual seq length
     """
     def __init__(

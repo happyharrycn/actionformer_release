@@ -114,6 +114,7 @@ class ANETdetection(object):
         ant_file,
         split=None,
         tiou_thresholds=np.linspace(0.1, 0.5, 5),
+        top_k=(1, 5),
         label='label_id',
         label_offset=0,
         num_workers=8,
@@ -121,6 +122,7 @@ class ANETdetection(object):
     ):
 
         self.tiou_thresholds = tiou_thresholds
+        self.top_k = top_k
         self.ap = None
         self.num_workers = num_workers
         if dataset_name is not None:
@@ -169,6 +171,28 @@ class ANETdetection(object):
 
         return ap
 
+    def wrapper_compute_topkx_recall(self, preds):
+        """Computes Top-kx recall for each class in the subset.
+        """
+        recall = np.zeros((len(self.tiou_thresholds), len(self.top_k), len(self.activity_index)))
+
+        # Adaptation to query faster
+        ground_truth_by_label = self.ground_truth.groupby('label')
+        prediction_by_label = preds.groupby('label')
+
+        results = Parallel(n_jobs=self.num_workers)(
+            delayed(compute_topkx_recall_detection)(
+                ground_truth=ground_truth_by_label.get_group(cidx).reset_index(drop=True),
+                prediction=self._get_predictions_with_label(prediction_by_label, label_name, cidx),
+                tiou_thresholds=self.tiou_thresholds,
+                top_k=self.top_k,
+            ) for label_name, cidx in self.activity_index.items())
+
+        for i, cidx in enumerate(self.activity_index.values()):
+            recall[...,cidx] = results[i]
+
+        return recall
+
     def evaluate(self, preds, verbose=True):
         """Evaluates a prediction file. For the detection task we measure the
         interpolated mean average precision to measure the performance of a
@@ -199,7 +223,9 @@ class ANETdetection(object):
 
         # compute mAP
         self.ap = self.wrapper_compute_average_precision(preds)
+        self.recall = self.wrapper_compute_topkx_recall(preds)
         mAP = self.ap.mean(axis=1)
+        mRecall = self.recall.mean(axis=2)
         average_mAP = mAP.mean()
 
         # print results
@@ -209,13 +235,16 @@ class ANETdetection(object):
                 self.dataset_name)
             )
             block = ''
-            for tiou, tiou_mAP in zip(self.tiou_thresholds, mAP):
-                block += '\n|tIoU = {:.2f}: mAP = {:.2f} (%)'.format(tiou, tiou_mAP*100)
+            for tiou, tiou_mAP, tiou_mRecall in zip(self.tiou_thresholds, mAP, mRecall):
+                block += '\n|tIoU = {:.2f}: '.format(tiou)
+                block += 'mAP = {:>4.2f} (%) '.format(tiou_mAP*100)
+                for idx, k in enumerate(self.top_k):
+                    block += 'Recall@{:d}x = {:>4.2f} (%) '.format(k, tiou_mRecall[idx]*100)
             print(block)
-            print('Avearge mAP: {:.2f} (%)'.format(average_mAP*100))
+            print('Average mAP: {:>4.2f} (%)'.format(average_mAP*100))
 
         # return the results
-        return mAP, average_mAP
+        return mAP, average_mAP, mRecall
 
 
 def compute_average_precision_detection(
@@ -299,6 +328,79 @@ def compute_average_precision_detection(
         ap[tidx] = interpolated_prec_rec(precision_cumsum[tidx,:], recall_cumsum[tidx,:])
 
     return ap
+
+
+def compute_topkx_recall_detection(
+    ground_truth,
+    prediction,
+    tiou_thresholds=np.linspace(0.1, 0.5, 5),
+    top_k=(1, 5),
+):
+    """Compute recall (detection task) between ground truth and
+    predictions data frames. If multiple predictions occurs for the same
+    predicted segment, only the one with highest score is matches as
+    true positive. This code is greatly inspired by Pascal VOC devkit.
+    Parameters
+    ----------
+    ground_truth : df
+        Data frame containing the ground truth instances.
+        Required fields: ['video-id', 't-start', 't-end']
+    prediction : df
+        Data frame containing the prediction instances.
+        Required fields: ['video-id, 't-start', 't-end', 'score']
+    tiou_thresholds : 1darray, optional
+        Temporal intersection over union threshold.
+    top_k: tuple, optional
+        Top-kx results of a action category where x stands for the number of 
+        instances for the action category in the video.
+    Outputs
+    -------
+    recall : float
+        Recall score.
+    """
+    if prediction.empty:
+        return np.zeros((len(tiou_thresholds), len(top_k)))
+
+    # Initialize true positive vectors.
+    tp = np.zeros((len(tiou_thresholds), len(top_k)))
+    n_gts = 0
+
+    # Adaptation to query faster
+    ground_truth_gbvn = ground_truth.groupby('video-id')
+    prediction_gbvn = prediction.groupby('video-id')
+
+    for videoid, _ in ground_truth_gbvn.groups.items():
+        ground_truth_videoid = ground_truth_gbvn.get_group(videoid)
+        n_gts += len(ground_truth_videoid)
+        try:
+            prediction_videoid = prediction_gbvn.get_group(videoid)
+        except Exception as e:
+            continue
+
+        this_gt = ground_truth_videoid.reset_index()
+        this_pred = prediction_videoid.reset_index()
+
+        # Sort predictions by decreasing score order.
+        score_sort_idx = this_pred['score'].values.argsort()[::-1]
+        top_kx_idx = score_sort_idx[:max(top_k) * len(this_gt)]
+        tiou_arr = k_segment_iou(this_pred[['t-start', 't-end']].values[top_kx_idx],
+                                 this_gt[['t-start', 't-end']].values)
+            
+        for tidx, tiou_thr in enumerate(tiou_thresholds):
+            for kidx, k in enumerate(top_k):
+                tiou = tiou_arr[:k * len(this_gt)]
+                tp[tidx, kidx] += ((tiou >= tiou_thr).sum(axis=0) > 0).sum()
+
+    recall = tp / n_gts
+
+    return recall
+
+
+def k_segment_iou(target_segments, candidate_segments):
+    return np.stack(
+        [segment_iou(target_segment, candidate_segments) \
+            for target_segment in target_segments]
+    )
 
 
 def segment_iou(target_segment, candidate_segments):

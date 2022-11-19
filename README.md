@@ -1,7 +1,9 @@
 # ActionFormer: Localizing Moments of Actions with Transformers
 
 ## Introduction
-This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our paper is accepted to ECCV 2022 and an arXiv version can be found in [this link](https://arxiv.org/abs/2202.07925). We invite our audience to try out the code.
+This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our paper is accepted to ECCV 2022 and an arXiv version can be found at [this link](https://arxiv.org/abs/2202.07925).
+
+In addition, ActionFormer is the backbone for many winning solutions in the Ego4D Moment Queries Challenge 2022. Our submission in particular is ranked 2nd with a record 21.76% average mAP and 42.54% Recall@1x, tIoU=0.5, nearly three times higher than the official baseline. An arXiv version of our tech report can be found at [this link](https://arxiv.org/pdf/2211.09074.pdf). We invite our audience to try out the code.
 
 <div align="center">
   <img src="teaser.jpg" width="600px"/>
@@ -10,6 +12,8 @@ This code repo implements Actionformer, one of the first Transformer-based model
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
 ## Changelog
+* 11/18/2022: We have released the tech report](https://arxiv.org/pdf/2211.09074.pdf) for our submission to the [Ego4D Moment Queries (MQ) Challenge](https://eval.ai/web/challenges/challenge-page/1626/overview). The code repo now includes config files, pre-trained models and results on the Ego4D MQ benchmark.
+
 * 08/29/2022: Updated arXiv version.
 
 * 08/01/2022: Updated code repo with latest results on ActivityNet.
@@ -279,6 +283,94 @@ python ./eval.py ./configs/epic_slowfast_noun.yaml ./pretrained/epic_slowfast_no
 | ActionFormer (verb) | 26.58 | 25.42 | 24.15 | 22.29 | 19.09 | 23.51 |
 | ActionFormer (noun) | 25.21 | 24.11 | 22.66 | 20.47 | 16.97 | 21.88 |
 
+## To Reproduce Our Results on Ego4D Moment Queries Benchmark
+**Download Features and Annotations**
+* Download the official SlowFast and Omnivore features from [the Ego4D website](https://ego4d-data.org/#download) and the official EgoVLP features from [this link](https://github.com/showlab/EgoVLP/issues/1#issuecomment-1219161343). Please note that we are not authorized to release the features and annotations. Instead, we provide our script for feature and annotation conversion at `./tools/convert_ego4d_trainval.py`.
+
+**Details**: All features are extracted at `1.875 fps` from videos at `30 fps`. This gives one feature vector per `0.5333` seconds. Please refer to Ego4D and EgoVLP's documentation for more details on feature extraction.
+
+**Unpack Features and Annotations**
+* Unpack the file under *./data* (or elsewhere and link to *./data*).
+* The folder structure should look like
+```
+This folder
+│   README.md
+│   ...  
+│
+└───data/
+│    └───ego4d/
+│    │   └───annotations
+│    │   └───slowfast_features
+│    │   └───omnivore_features
+│    │   └───egovlp_features  
+│    └───...
+|
+└───libs
+│
+│   ...
+```
+
+**Training and Evaluation**
+* We provide config files for training ActionFormer with three feature sets (SlowFast, Omnivore or EgoVLP alone, and SlowFast + Omnivore + EgoVLP). For example, training on all three features will create an experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
+```shell
+python ./train.py ./configs/ego4d_slowfast_omnivore_egovlp.yaml --output reproduce
+```
+* [Optional] Monitor the training using TensorBoard
+```shell
+tensorboard --logdir=./ckpt/ego4d_slowfast_omnivore_egovlp_reproduce/logs
+```
+* Evaluate the trained model. The expected average mAP and Recall@1x, tIoU=0.5 should be around 21.0(%) and 38.5(%) respectively as in Table 1 of our tech report.
+```shell
+python ./eval.py ./configs/ego4d_slowfast_omnivore_egovlp.yaml ./ckpt/ego4d_slowfast_omnivore_egovlp_reproduce
+```
+* Training our model on Ego4D with all three features requires ~4.5GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
+
+**[Optional] Evaluating Our Pre-trained Model**
+
+We also provide pre-trained models for Ego4D trained with all feature combinations. The models with all training logs can be downloaded from [this Google Drive link](https://drive.google.com/drive/folders/1NpAECS0ZhcCuehXkF9OhLQDPFrNdStJb?usp=sharing). To evaluate the pre-trained model, please follow the steps listed below.
+
+* Create a folder *./pretrained* and unpack the file under *./pretrained* (or elsewhere and link to *./pretrained*).
+* An example of the folder structure should look like
+```
+This folder
+│   README.md
+│   ...  
+│
+└───pretrained/
+│    └───ego4d_slowfast_omnivore_egovlp_reproduce/
+│    │   └───ego4d_slowfast_omnivore_egovlp_reproduce_log.txt
+│    │   └───ego4d_slowfast_omnivore_egovlp_reproduce_results.txt
+│    │   └───...   
+│    └───...
+|
+└───libs
+│
+│   ...
+```
+* The training config is recorded in *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/config.txt*.
+* The training log is located at *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/ego4d_slowfast_omnivore_egovlp_reproduce_log.txt* and also *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/logs*.
+* The pre-trained model is *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/epoch_010.pth.tar*.
+* Evaluate the pre-trained model.
+```shell
+python ./eval.py ./configs/ego4d_slowfast_omnivore_egovlp.yaml ./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/
+```
+* The results (mAP at tIoUs) should be
+
+| Method                |  0.1  |  0.2  |  0.3  |  0.4  |  0.5  |  Avg  |
+|-----------------------|-------|-------|-------|-------|-------|-------|
+| ActionFormer (S)      | 20.09 | 17.45 | 14.44 | 12.46 | 10.00 | 14.89 |
+| ActionFormer (O)      | 23.43 | 20.62 | 17.75 | 14.68 | 11.92 | 17.68 |
+| ActionFormer (E)      | 26.07 | 23.08 | 20.02 | 16.97 | 13.96 | 20.02 |
+| ActionFormer (S+O+E)  | 27.22 | 24.01 | 20.77 | 17.81 | 14.92 | 20.95 |
+
+* The results (Recall@1x at tIoUs) should be
+
+| Method                |  0.1  |  0.2  |  0.3  |  0.4  |  0.5  |  Avg  |
+|-----------------------|-------|-------|-------|-------|-------|-------|
+| ActionFormer (S)      | 52.25 | 45.84 | 40.60 | 36.58 | 31.33 | 41.32 |
+| ActionFormer (O)      | 55.04 | 48.04 | 41.84 | 36.72 | 32.03 | 42.73 |
+| ActionFormer (E)      | 58.38 | 52.29 | 47.81 | 41.37 | 35.92 | 47.15 |
+| ActionFormer (S+O+E)  | 60.34 | 53.73 | 48.18 | 43.49 | 38.84 | 48.92 |
 
 ## Training and Evaluating Your Own Dataset
 Work in progress. Stay tuned.
@@ -293,6 +385,16 @@ If you are using our code, please consider citing our paper.
   title={ActionFormer: Localizing Moments of Actions with Transformers},
   author={Zhang, Chenlin and Wu, Jianxin and Li, Yin},
   booktitle={European Conference on Computer Vision},
+  year={2022}
+}
+```
+
+If you cite our results on Ego4D, please consider citing our tech report in addition to the main paper.
+```
+@article{mu2022actionformerego4d,
+  title={Where a Strong Backbone Meets Strong Features -- ActionFormer for Ego4D Moment Queries Challenge},
+  author={Mu, Fangzhou and Mo, Sicheng and Wang, Gillian, and Li, Yin},
+  journal={arXiv e-prints},
   year={2022}
 }
 ```

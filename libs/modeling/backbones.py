@@ -21,7 +21,7 @@ class ConvTransformerBackbone(nn.Module):
         max_len,               # max sequence length
         arch = (2, 2, 5),      # (#convs, #stem transformers, #branch transformers)
         mha_win_size = [-1]*6, # size of local window for mha
-        scale_factor = 2,      # dowsampling rate for the branch,
+        scale_factor = 2,      # dowsampling rate for the branch
         with_ln = False,       # if to attach layernorm after conv
         attn_pdrop = 0.0,      # dropout rate for the attention map
         proj_pdrop = 0.0,      # dropout rate for the projection / MLP
@@ -40,35 +40,43 @@ class ConvTransformerBackbone(nn.Module):
         self.use_abs_pe = use_abs_pe
         self.use_rel_pe = use_rel_pe
 
-        # position embedding (1, C, T), rescaled by 1/sqrt(n_embd)
-        if self.use_abs_pe:
-            pos_embd = get_sinusoid_encoding(self.max_len, n_embd) / (n_embd**0.5)
-            self.register_buffer("pos_embd", pos_embd, persistent=False)
+        # feature projection
+        self.n_in = n_in
+        if isinstance(n_in, (list, tuple)):
+            assert isinstance(n_embd, (list, tuple)) and len(n_in) == len(n_embd)
+            self.proj = nn.ModuleList([
+                MaskedConv1D(c0, c1, 1) for c0, c1 in zip(n_in, n_embd)
+            ])
+            n_in = n_embd = sum(n_embd)
+        else:
+            self.proj = None
 
         # embedding network using convs
         self.embd = nn.ModuleList()
         self.embd_norm = nn.ModuleList()
         for idx in range(arch[0]):
-            if idx == 0:
-                in_channels = n_in
-            else:
-                in_channels = n_embd
-            self.embd.append(MaskedConv1D(
-                    in_channels, n_embd, n_embd_ks,
+            n_in = n_embd if idx > 0 else n_in
+            self.embd.append(
+                MaskedConv1D(
+                    n_in, n_embd, n_embd_ks,
                     stride=1, padding=n_embd_ks//2, bias=(not with_ln)
                 )
             )
             if with_ln:
-                self.embd_norm.append(
-                    LayerNorm(n_embd)
-                )
+                self.embd_norm.append(LayerNorm(n_embd))
             else:
                 self.embd_norm.append(nn.Identity())
+
+        # position embedding (1, C, T), rescaled by 1/sqrt(n_embd)
+        if self.use_abs_pe:
+            pos_embd = get_sinusoid_encoding(self.max_len, n_embd) / (n_embd**0.5)
+            self.register_buffer("pos_embd", pos_embd, persistent=False)
 
         # stem network using (vanilla) transformer
         self.stem = nn.ModuleList()
         for idx in range(arch[1]):
-            self.stem.append(TransformerBlock(
+            self.stem.append(
+                TransformerBlock(
                     n_embd, n_head,
                     n_ds_strides=(1, 1),
                     attn_pdrop=attn_pdrop,
@@ -82,13 +90,14 @@ class ConvTransformerBackbone(nn.Module):
         # main branch using transformer with pooling
         self.branch = nn.ModuleList()
         for idx in range(arch[2]):
-            self.branch.append(TransformerBlock(
+            self.branch.append(
+                TransformerBlock(
                     n_embd, n_head,
                     n_ds_strides=(self.scale_factor, self.scale_factor),
                     attn_pdrop=attn_pdrop,
                     proj_pdrop=proj_pdrop,
                     path_pdrop=path_pdrop,
-                    mha_win_size=self.mha_win_size[1+idx],
+                    mha_win_size=self.mha_win_size[1 + idx],
                     use_rel_pe=self.use_rel_pe
                 )
             )
@@ -106,6 +115,14 @@ class ConvTransformerBackbone(nn.Module):
         # x: batch size, feature channel, sequence length,
         # mask: batch size, 1, sequence length (bool)
         B, C, T = x.size()
+
+        # feature projection
+        if isinstance(self.n_in, (list, tuple)):
+            x = torch.cat(
+                [proj(s, mask)[0] \
+                    for proj, s in zip(self.proj, x.split(self.n_in, dim=1))
+                ], dim=1
+            )
 
         # embedding network
         for idx in range(len(self.embd)):
@@ -134,11 +151,8 @@ class ConvTransformerBackbone(nn.Module):
             x, mask = self.stem[idx](x, mask)
 
         # prep for outputs
-        out_feats = tuple()
-        out_masks = tuple()
-        # 1x resolution
-        out_feats += (x, )
-        out_masks += (mask, )
+        out_feats = (x, )
+        out_masks = (mask, )
 
         # main branch with downsampling
         for idx in range(len(self.branch)):
@@ -147,6 +161,7 @@ class ConvTransformerBackbone(nn.Module):
             out_masks += (mask, )
 
         return out_feats, out_masks
+
 
 @register_backbone("conv")
 class ConvBackbone(nn.Module):
@@ -163,37 +178,44 @@ class ConvBackbone(nn.Module):
         with_ln=False,      # if to use layernorm
     ):
         super().__init__()
-        assert len(arch) == 3
+        assert len(arch) == 4
         self.arch = arch
         self.relu = nn.ReLU(inplace=True)
         self.scale_factor = scale_factor
+
+        # feature projection
+        self.n_in = n_in
+        if isinstance(n_in, (list, tuple)):
+            assert isinstance(n_embd, (list, tuple)) and len(n_in) == len(n_embd)
+            self.proj = nn.ModuleList([
+                MaskedConv1D(c0, c1, 1) for c0, c1 in zip(n_in, n_embd)
+            ])
+            n_in = n_embd = sum(n_embd)
+        else:
+            self.proj = None
 
         # embedding network using convs
         self.embd = nn.ModuleList()
         self.embd_norm = nn.ModuleList()
         for idx in range(arch[0]):
-            if idx == 0:
-                in_channels = n_in
-            else:
-                in_channels = n_embd
-            self.embd.append(MaskedConv1D(
-                    in_channels, n_embd, n_embd_ks,
+            n_in = n_embd if idx > 0 else n_in
+            self.embd.append(
+                MaskedConv1D(
+                    n_in, n_embd, n_embd_ks,
                     stride=1, padding=n_embd_ks//2, bias=(not with_ln)
                 )
             )
             if with_ln:
-                self.embd_norm.append(
-                    LayerNorm(n_embd)
-                )
+                self.embd_norm.append(LayerNorm(n_embd))
             else:
                 self.embd_norm.append(nn.Identity())
 
-        # stem network using (vanilla) transformer
+        # stem network using convs
         self.stem = nn.ModuleList()
         for idx in range(arch[1]):
             self.stem.append(ConvBlock(n_embd, 3, 1))
 
-        # main branch using transformer with pooling
+        # main branch using convs with pooling
         self.branch = nn.ModuleList()
         for idx in range(arch[2]):
             self.branch.append(ConvBlock(n_embd, 3, self.scale_factor))
@@ -212,6 +234,14 @@ class ConvBackbone(nn.Module):
         # mask: batch size, 1, sequence length (bool)
         B, C, T = x.size()
 
+        # feature projection
+        if isinstance(self.n_in, (list, tuple)):
+            x = torch.cat(
+                [proj(s, mask)[0] \
+                    for proj, s in zip(self.proj, x.split(self.n_in, dim=1))
+                ], dim=1
+            )
+
         # embedding network
         for idx in range(len(self.embd)):
             x, mask = self.embd[idx](x, mask)
@@ -222,11 +252,8 @@ class ConvBackbone(nn.Module):
             x, mask = self.stem[idx](x, mask)
 
         # prep for outputs
-        out_feats = tuple()
-        out_masks = tuple()
-        # 1x resolution
-        out_feats += (x, )
-        out_masks += (mask, )
+        out_feats = (x, )
+        out_masks = (mask, )
 
         # main branch with downsampling
         for idx in range(len(self.branch)):

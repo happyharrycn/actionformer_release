@@ -92,7 +92,7 @@ def main(args):
             checkpoint = torch.load(args.resume,
                 map_location = lambda storage, loc: storage.cuda(
                     cfg['devices'][0]))
-            args.start_epoch = checkpoint['epoch'] + 1
+            args.start_epoch = checkpoint['epoch']
             model.load_state_dict(checkpoint['state_dict'])
             model_ema.module.load_state_dict(checkpoint['state_dict_ema'])
             # also load the optimizer / scheduler if necessary
@@ -135,15 +135,11 @@ def main(args):
 
         # save ckpt once in a while
         if (
-            (epoch == max_epochs - 1) or
-            (
-                (args.ckpt_freq > 0) and
-                (epoch % args.ckpt_freq == 0) and
-                (epoch > 0)
-            )
+            ((epoch + 1) == max_epochs) or
+            ((args.ckpt_freq > 0) and ((epoch + 1) % args.ckpt_freq == 0))
         ):
             save_states = {
-                'epoch': epoch,
+                'epoch': epoch + 1,
                 'state_dict': model.state_dict(),
                 'scheduler': scheduler.state_dict(),
                 'optimizer': optimizer.state_dict(),
@@ -154,7 +150,7 @@ def main(args):
                 save_states,
                 False,
                 file_folder=ckpt_folder,
-                file_name='epoch_{:03d}.pth.tar'.format(epoch)
+                file_name='epoch_{:03d}.pth.tar'.format(epoch + 1)
             )
 
     # wrap up

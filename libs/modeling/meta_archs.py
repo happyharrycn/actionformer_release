@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 
 import torch
 from torch import nn
@@ -9,7 +10,6 @@ from .blocks import MaskedConv1D, Scale, LayerNorm
 from .losses import ctr_diou_loss_1d, sigmoid_focal_loss
 
 from ..utils import batched_nms
-
 
 class PtTransformerClsHead(nn.Module):
     """
@@ -49,9 +49,7 @@ class PtTransformerClsHead(nn.Module):
                 )
             )
             if with_ln:
-                self.norm.append(
-                    LayerNorm(out_dim)
-                )
+                self.norm.append(LayerNorm(out_dim))
             else:
                 self.norm.append(nn.Identity())
 
@@ -129,9 +127,7 @@ class PtTransformerRegHead(nn.Module):
                 )
             )
             if with_ln:
-                self.norm.append(
-                    LayerNorm(out_dim)
-                )
+                self.norm.append(LayerNorm(out_dim))
             else:
                 self.norm.append(nn.Identity())
 
@@ -172,9 +168,9 @@ class PtTransformer(nn.Module):
         self,
         backbone_type,         # a string defines which backbone we use
         fpn_type,              # a string defines which fpn we use
-        backbone_arch,         # a tuple defines # layers in embed / stem / branch
+        backbone_arch,         # a tuple defines #layers in embed / stem / up / down
         scale_factor,          # scale factor between branch layers
-        input_dim,             # input feat dim
+        input_dim,             # combined input feat dim
         max_seq_len,           # max sequence length (used for training)
         max_buffer_len_factor, # max buffer size (defined a factor of max_seq_len)
         n_head,                # number of heads for self-attention in transformer
@@ -184,7 +180,7 @@ class PtTransformer(nn.Module):
         embd_with_ln,          # attach layernorm to embedding network
         fpn_dim,               # feature dim on FPN
         fpn_with_ln,           # if to apply layer norm at the end of fpn
-        fpn_start_level,       # start level of fpn
+        fpn_start_level,       # start level of fpn (for 'conv' and 'identity')
         head_dim,              # feature dim for head
         regression_range,      # regression range on each level of FPN
         head_num_layers,       # number of layers in the head (including the classifier)
@@ -197,7 +193,7 @@ class PtTransformer(nn.Module):
         test_cfg               # other cfg for testing
     ):
         super().__init__()
-        # re-distribute params to backbone / neck / head
+         # re-distribute params to backbone / neck / head
         self.fpn_strides = [scale_factor**i for i in range(
             fpn_start_level, backbone_arch[-1]+1
         )]
@@ -281,6 +277,8 @@ class PtTransformer(nn.Module):
                     'with_ln' : embd_with_ln
                 }
             )
+        if isinstance(embd_dim, (list, tuple)):
+            embd_dim = sum(embd_dim)
 
         # fpn network: convs
         assert fpn_type in ['fpn', 'identity']
@@ -449,7 +447,7 @@ class PtTransformer(nn.Module):
 
     @torch.no_grad()
     def label_points_single_video(self, concat_points, gt_segment, gt_label):
-        # concat_points : F T x 4 (t, regressoin range, stride)
+        # concat_points : F T x 4 (t, regression range, stride)
         # gt_segment : N (#Events) x 2
         # gt_label : N (#Events) x 1
         num_pts = concat_points.shape[0]
@@ -743,6 +741,7 @@ class PtTransformer(nn.Module):
                 # truncate all boundaries within [0, duration]
                 segs[segs<=0.0] *= 0.0
                 segs[segs>=vlen] = segs[segs>=vlen] * 0.0 + vlen
+            
             # 4: repack the results
             processed_results.append(
                 {'video_id' : vidx,

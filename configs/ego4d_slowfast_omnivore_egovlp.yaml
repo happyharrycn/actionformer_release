@@ -1,0 +1,68 @@
+dataset_name: ego4d
+train_split: ['training']
+val_split: ['validation']
+dataset: {
+  json_file: ./data/ego4d/annotations/ego4d.json,
+  feat_folder: [
+    './data/ego4d/slowfast_features', 
+    './data/ego4d/omnivore_features', 
+    './data/ego4d/egovlp_features'
+  ],
+  file_prefix: ~,
+  file_ext: .npy,
+  num_classes: 110,
+  input_dim: [2304, 1536, 256],
+  feat_stride: 16,
+  num_frames: 32,
+  default_fps: 30,
+  trunc_thresh: 0.3,
+  crop_ratio: [0.9, 1.0],
+  max_seq_len: 1024,
+}
+model: {
+  regression_range: [
+    [0, 4], 
+    [2, 8], 
+    [4, 16], 
+    [8, 32], 
+    [16, 64], 
+    [32, 128], 
+    [64, 10000]
+  ],
+  fpn_type: identity,
+  backbone_arch: [2, 2, 6],
+  max_buffer_len_factor: 4.0,
+  n_mha_win_size: 9,
+  n_head: 16,
+  embd_dim: [384, 384, 256],
+  fpn_dim: 1024,
+  head_dim: 1024,
+  use_abs_pe: true,
+}
+opt: {
+  learning_rate: 0.0001,
+  epochs: 10,
+  weight_decay: 0.05,
+  schedule_type: cosine,
+}
+loader: {
+  batch_size: 2,
+}
+train_cfg: {
+  init_loss_norm: 100,
+  clip_grad_l2norm: 1.0,
+  cls_prior_prob: 0.01,
+  center_sample: radius,
+  center_sample_radius: 1.5,
+  dropout: 0.1,
+  droppath: 0.1,
+}
+test_cfg: {
+  pre_nms_topk: 5000,
+  max_seg_num: 2000,
+  min_score: 0.001,
+  nms_sigma: 0.9,
+  multiclass_nms: True,
+  voting_thresh: 0.95,
+}
+output_folder: ./ckpt/

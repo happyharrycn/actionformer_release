@@ -17,7 +17,7 @@ class FPN1D(nn.Module):
         scale_factor=2.0, # downsampling rate between two fpn levels
         start_level=0,    # start fpn level
         end_level=-1,     # end fpn level
-        with_ln=True      # if to apply layer norm at the end
+        with_ln=True,     # if to apply layer norm at the end
     ):
         super().__init__()
         assert isinstance(in_channels, list) or isinstance(in_channels, tuple)
@@ -40,7 +40,8 @@ class FPN1D(nn.Module):
         for i in range(self.start_level, self.end_level):
             # disable bias if using layer norm
             l_conv = MaskedConv1D(
-                in_channels[i], out_channel, 1, bias=(not with_ln))
+                in_channels[i], out_channel, 1, bias=(not with_ln)
+            )
             # use depthwise conv here for efficiency
             fpn_conv = MaskedConv1D(
                 out_channel, out_channel, 3,
@@ -72,10 +73,8 @@ class FPN1D(nn.Module):
         # build top-down path
         used_backbone_levels = len(laterals)
         for i in range(used_backbone_levels - 1, 0, -1):
-            laterals[i-1] += F.interpolate(
-                laterals[i],
-                scale_factor=self.scale_factor,
-                mode='nearest'
+            laterals[i - 1] += F.interpolate(
+                laterals[i], scale_factor=self.scale_factor, mode='nearest'
             )
 
         # fpn conv / norm -> outputs
@@ -91,16 +90,17 @@ class FPN1D(nn.Module):
 
         return fpn_feats, new_fpn_masks
 
+
 @register_neck('identity')
 class FPNIdentity(nn.Module):
     def __init__(
         self,
-        in_channels,      # input feature channels, len(in_channels) = # levels
+        in_channels,      # input feature channels, len(in_channels) = #levels
         out_channel,      # output feature channel
         scale_factor=2.0, # downsampling rate between two fpn levels
         start_level=0,    # start fpn level
         end_level=-1,     # end fpn level
-        with_ln=True      # if to apply layer norm at the end
+        with_ln=True,     # if to apply layer norm at the end
     ):
         super().__init__()
 
