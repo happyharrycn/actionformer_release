@@ -1,5 +1,4 @@
 import math
-from copy import deepcopy
 
 import torch
 from torch import nn
@@ -168,9 +167,9 @@ class PtTransformer(nn.Module):
         self,
         backbone_type,         # a string defines which backbone we use
         fpn_type,              # a string defines which fpn we use
-        backbone_arch,         # a tuple defines #layers in embed / stem / up / down
+        backbone_arch,         # a tuple defines #layers in embed / stem / branch
         scale_factor,          # scale factor between branch layers
-        input_dim,             # combined input feat dim
+        input_dim,             # input feat dim
         max_seq_len,           # max sequence length (used for training)
         max_buffer_len_factor, # max buffer size (defined a factor of max_seq_len)
         n_head,                # number of heads for self-attention in transformer
@@ -180,7 +179,7 @@ class PtTransformer(nn.Module):
         embd_with_ln,          # attach layernorm to embedding network
         fpn_dim,               # feature dim on FPN
         fpn_with_ln,           # if to apply layer norm at the end of fpn
-        fpn_start_level,       # start level of fpn (for 'conv' and 'identity')
+        fpn_start_level,       # start level of fpn
         head_dim,              # feature dim for head
         regression_range,      # regression range on each level of FPN
         head_num_layers,       # number of layers in the head (including the classifier)

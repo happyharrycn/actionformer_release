@@ -178,7 +178,7 @@ class ConvBackbone(nn.Module):
         with_ln=False,      # if to use layernorm
     ):
         super().__init__()
-        assert len(arch) == 4
+        assert len(arch) == 3
         self.arch = arch
         self.relu = nn.ReLU(inplace=True)
         self.scale_factor = scale_factor

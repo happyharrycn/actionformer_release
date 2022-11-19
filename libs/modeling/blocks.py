@@ -223,63 +223,32 @@ class MaskedMHCA(nn.Module):
         self.scale = 1.0 / math.sqrt(self.n_channels)
 
         # conv/pooling operations
-        assert n_qx_stride == n_kv_stride
-        if n_qx_stride >= 1:
-            assert (n_qx_stride == 1) or (n_qx_stride % 2 == 0)
-            assert (n_kv_stride == 1) or (n_kv_stride % 2 == 0)
+        assert (n_qx_stride == 1) or (n_qx_stride % 2 == 0)
+        assert (n_kv_stride == 1) or (n_kv_stride % 2 == 0)
+        self.n_qx_stride = n_qx_stride
+        self.n_kv_stride = n_kv_stride
 
-            # query conv (depthwise)
-            kernel_size = n_qx_stride + 1 if n_qx_stride > 1 else 3
-            stride, padding = n_kv_stride, kernel_size // 2
-            self.query_conv = MaskedConv1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, groups=self.n_embd, bias=False
-            )
-
-            # key, value conv (depthwise)
-            kernel_size = n_kv_stride + 1 if n_kv_stride > 1 else 3
-            stride, padding = n_kv_stride, kernel_size // 2
-            self.key_conv = MaskedConv1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, groups=self.n_embd, bias=False
-            )
-            self.value_conv = MaskedConv1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, groups=self.n_embd, bias=False
-            )
-        else:
-            n_qx_stride = int(1.0 / n_qx_stride)
-            n_kv_stride = int(1.0 / n_kv_stride)
-            assert (n_qx_stride % 2 == 0) and (n_kv_stride % 2 == 0)
-
-            # query transposed conv (depthwise)
-            kernel_size = n_qx_stride + 1
-            stride, padding = n_qx_stride, kernel_size // 2
-            output_padding = stride - 1
-            self.query_conv = MaskedConvTranspose1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, output_padding=output_padding,
-                groups=self.n_embd, bias=False
-            )
-
-            # key, value transposed conv (depthwise)
-            kernel_size = n_kv_stride + 1
-            stride, padding = n_kv_stride, kernel_size // 2
-            output_padding = stride - 1
-            self.key_conv = MaskedConvTranspose1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, output_padding=output_padding,
-                groups=self.n_embd, bias=False
-            )
-            self.value_conv = MaskedConvTranspose1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, output_padding=output_padding,
-                groups=self.n_embd, bias=False
-            )
-        
-        # layernorm
+        # query conv (depthwise)
+        kernel_size = self.n_qx_stride + 1 if self.n_qx_stride > 1 else 3
+        stride, padding = self.n_kv_stride, kernel_size // 2
+        self.query_conv = MaskedConv1D(
+            self.n_embd, self.n_embd, kernel_size,
+            stride=stride, padding=padding, groups=self.n_embd, bias=False
+        )
         self.query_norm = LayerNorm(self.n_embd)
+
+        # key, value conv (depthwise)
+        kernel_size = self.n_kv_stride + 1 if self.n_kv_stride > 1 else 3
+        stride, padding = self.n_kv_stride, kernel_size // 2
+        self.key_conv = MaskedConv1D(
+            self.n_embd, self.n_embd, kernel_size,
+            stride=stride, padding=padding, groups=self.n_embd, bias=False
+        )
         self.key_norm = LayerNorm(self.n_embd)
+        self.value_conv = MaskedConv1D(
+            self.n_embd, self.n_embd, kernel_size,
+            stride=stride, padding=padding, groups=self.n_embd, bias=False
+        )
         self.value_norm = LayerNorm(self.n_embd)
 
         # key, query, value projections for all heads
@@ -379,63 +348,32 @@ class LocalMaskedMHCA(nn.Module):
         self.use_rel_pe = use_rel_pe
 
         # conv/pooling operations
-        assert n_qx_stride == n_kv_stride
-        if n_qx_stride >= 1:
-            assert (n_qx_stride == 1) or (n_qx_stride % 2 == 0)
-            assert (n_kv_stride == 1) or (n_kv_stride % 2 == 0)
+        assert (n_qx_stride == 1) or (n_qx_stride % 2 == 0)
+        assert (n_kv_stride == 1) or (n_kv_stride % 2 == 0)
+        self.n_qx_stride = n_qx_stride
+        self.n_kv_stride = n_kv_stride
 
-            # query conv (depthwise)
-            kernel_size = n_qx_stride + 1 if n_qx_stride > 1 else 3
-            stride, padding = n_kv_stride, kernel_size // 2
-            self.query_conv = MaskedConv1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, groups=self.n_embd, bias=False
-            )
-
-            # key, value conv (depthwise)
-            kernel_size = n_kv_stride + 1 if n_kv_stride > 1 else 3
-            stride, padding = n_kv_stride, kernel_size // 2
-            self.key_conv = MaskedConv1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, groups=self.n_embd, bias=False
-            )
-            self.value_conv = MaskedConv1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, groups=self.n_embd, bias=False
-            )
-        else:
-            n_qx_stride = int(1.0 / n_qx_stride)
-            n_kv_stride = int(1.0 / n_kv_stride)
-            assert (n_qx_stride % 2 == 0) and (n_kv_stride % 2 == 0)
-
-            # query transposed conv (depthwise)
-            kernel_size = n_qx_stride + 1
-            stride, padding = n_qx_stride, kernel_size // 2
-            output_padding = stride - 1
-            self.query_conv = MaskedConvTranspose1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, output_padding=output_padding,
-                groups=self.n_embd, bias=False
-            )
-
-            # key, value transposed conv (depthwise)
-            kernel_size = n_kv_stride + 1
-            stride, padding = n_kv_stride, kernel_size // 2
-            output_padding = stride - 1
-            self.key_conv = MaskedConvTranspose1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, output_padding=output_padding,
-                groups=self.n_embd, bias=False
-            )
-            self.value_conv = MaskedConvTranspose1D(
-                self.n_embd, self.n_embd, kernel_size,
-                stride=stride, padding=padding, output_padding=output_padding,
-                groups=self.n_embd, bias=False
-            )
-        
-        # layernorm
+        # query conv (depthwise)
+        kernel_size = self.n_qx_stride + 1 if self.n_qx_stride > 1 else 3
+        stride, padding = self.n_kv_stride, kernel_size // 2
+        self.query_conv = MaskedConv1D(
+            self.n_embd, self.n_embd, kernel_size,
+            stride=stride, padding=padding, groups=self.n_embd, bias=False
+        )
         self.query_norm = LayerNorm(self.n_embd)
+
+        # key, value conv (depthwise)
+        kernel_size = self.n_kv_stride + 1 if self.n_kv_stride > 1 else 3
+        stride, padding = self.n_kv_stride, kernel_size // 2
+        self.key_conv = MaskedConv1D(
+            self.n_embd, self.n_embd, kernel_size,
+            stride=stride, padding=padding, groups=self.n_embd, bias=False
+        )
         self.key_norm = LayerNorm(self.n_embd)
+        self.value_conv = MaskedConv1D(
+            self.n_embd, self.n_embd, kernel_size,
+            stride=stride, padding=padding, groups=self.n_embd, bias=False
+        )
         self.value_norm = LayerNorm(self.n_embd)
 
         # key, query, value projections for all heads
