@@ -9,7 +9,7 @@ Directory structure before processing:
 
 This folder
 │  convert_ego4d_trainval.py
-│  label_map.txt
+│  ego4d_label_map.txt
 │  ... 
 │
 └───features
@@ -30,8 +30,8 @@ omnivore_dir = 'features/omnivore_video_swinl'
 train_annot_path = 'annotations/moments_train.json'
 val_annot_path = 'annotations/moments_val.json'
 
-# label mapping (can be found in ./configs/ego4d/)
-label_map_path = 'label_map.txt'
+# label mapping
+label_map_path = 'ego4d_label_map.txt'
 
 # where to save the processed features
 slowfast_out_dir = 'features/slowfast_features'

@@ -12,7 +12,7 @@ In addition, ActionFormer is the backbone for many winning solutions in the Ego4
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
 ## Changelog
-* 11/18/2022: We have released the tech report](https://arxiv.org/pdf/2211.09074.pdf) for our submission to the [Ego4D Moment Queries (MQ) Challenge](https://eval.ai/web/challenges/challenge-page/1626/overview). The code repo now includes config files, pre-trained models and results on the Ego4D MQ benchmark.
+* 11/18/2022: We have released the [tech report](https://arxiv.org/pdf/2211.09074.pdf) for our submission to the [Ego4D Moment Queries (MQ) Challenge](https://eval.ai/web/challenges/challenge-page/1626/overview). The code repo now includes config files, pre-trained models and results on the Ego4D MQ benchmark.
 
 * 08/29/2022: Updated arXiv version.
 
@@ -314,9 +314,9 @@ python ./eval.py ./configs/epic_slowfast_noun.yaml ./pretrained/epic_slowfast_no
 
 ## To Reproduce Our Results on Ego4D Moment Queries Benchmark
 **Download Features and Annotations**
-* Download the official SlowFast and Omnivore features from [the Ego4D website](https://ego4d-data.org/#download) and the official EgoVLP features from [this link](https://github.com/showlab/EgoVLP/issues/1#issuecomment-1219161343). Please note that we are not authorized to release the features and annotations. Instead, we provide our script for feature and annotation conversion at `./tools/convert_ego4d_trainval.py`.
+* Download the official SlowFast and Omnivore features from [the Ego4D website](https://ego4d-data.org/#download) and the official EgoVLP features from [this link](https://github.com/showlab/EgoVLP/issues/1#issuecomment-1219076014). Please note that we are not authorized to release the features and annotations. Instead, we provide our script for feature and annotation conversion at `./tools/convert_ego4d_trainval.py`.
 
-**Details**: All features are extracted at `1.875 fps` from videos at `30 fps`. This gives one feature vector per `0.5333` seconds. Please refer to Ego4D and EgoVLP's documentation for more details on feature extraction.
+**Details**: All features are extracted at `1.875 fps` from videos at `30 fps`. This gives one feature vector per `~0.5333` seconds. Please refer to Ego4D and EgoVLP's documentation for more details on feature extraction.
 
 **Unpack Features and Annotations**
 * Unpack the file under *./data* (or elsewhere and link to *./data*).
