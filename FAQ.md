@@ -39,6 +39,11 @@ Namely, 0.0 and 1.0 on the feature grids correspond to frame index 1.5 and 3.5, 
 **A:** This is no longer needed in the code.
 ##
 
+**Q:** Why some of the videos in the training / validation set of ActivityNet are not considered?
+**A:** The original release of ActivityNet contains links to youtube videos. Over the time, some of the videos are no longer available and thus their pre-extracted features might not exist. Videos on ActivityNet are filtered out if (1) they don’t have video features (or the length of video features does not match the video duration); or (2) they don’t have any actions that last longer than 0.01 seconds (this is only done for training set).
+
+##
+
 **Q:** How to use I3D models to extract video features?
 
 **A:** We refer to [this repo](https://github.com/Finspire13/pytorch-i3d-feature-extraction) for extracting video features using I3D models.
