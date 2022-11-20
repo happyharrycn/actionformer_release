@@ -414,6 +414,9 @@ If you are using our code, please consider citing our paper.
   title={ActionFormer: Localizing Moments of Actions with Transformers},
   author={Zhang, Chen-Lin and Wu, Jianxin and Li, Yin},
   booktitle={European Conference on Computer Vision},
+  series={LNCS},
+	volume={13664},
+	pages={492-510},
   year={2022}
 }
 ```
