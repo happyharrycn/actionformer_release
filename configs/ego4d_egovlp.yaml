@@ -23,10 +23,11 @@ model: {
     [8, 32], 
     [16, 64], 
     [32, 128], 
-    [64, 10000]
+    [64, 256],
+    [128, 10000]
   ],
   fpn_type: identity,
-  backbone_arch: [2, 2, 6],
+  backbone_arch: [2, 2, 7],
   max_buffer_len_factor: 4.0,
   n_mha_win_size: 9,
   embd_dim: 384,

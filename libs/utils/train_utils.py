@@ -31,7 +31,8 @@ def fix_random_seed(seed, include_cuda=True):
         torch.cuda.manual_seed_all(seed)
         # this is needed for CUDA >= 10.2
         os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
-        torch.use_deterministic_algorithms(True, warn_only=True)
+        torch.use_deterministic_algorithms(True)
+        # torch.use_deterministic_algorithms(True, warn_only=True)
     else:
         cudnn.enabled = True
         cudnn.benchmark = True

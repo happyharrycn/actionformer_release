@@ -32,6 +32,7 @@ class ConvTransformerBackbone(nn.Module):
         super().__init__()
         assert len(arch) == 3
         assert len(mha_win_size) == (1 + arch[2])
+        self.n_in = n_in
         self.arch = arch
         self.mha_win_size = mha_win_size
         self.max_len = max_len
@@ -179,6 +180,7 @@ class ConvBackbone(nn.Module):
     ):
         super().__init__()
         assert len(arch) == 3
+        self.n_in = n_in
         self.arch = arch
         self.relu = nn.ReLU(inplace=True)
         self.scale_factor = scale_factor

@@ -3,7 +3,7 @@
 ## Introduction
 This code repo implements Actionformer, one of the first Transformer-based model for temporal action localization --- detecting the onsets and offsets of action instances and recognizing their action categories. Without bells and whistles, ActionFormer achieves 71.0% mAP at tIoU=0.5 on THUMOS14, outperforming the best prior model by 14.1 absolute percentage points and crossing the 60% mAP for the first time. Further, ActionFormer demonstrates strong results on ActivityNet 1.3 (36.56% average mAP) and the more challenging EPIC-Kitchens 100 (+13.5% average mAP over prior works). Our paper is accepted to ECCV 2022 and an arXiv version can be found at [this link](https://arxiv.org/abs/2202.07925).
 
-In addition, ActionFormer is the backbone for many winning solutions in the Ego4D Moment Queries Challenge 2022. Our submission in particular is ranked 2nd with a record 21.76% average mAP and 42.54% Recall@1x, tIoU=0.5, nearly three times higher than the official baseline. An arXiv version of our tech report can be found at [this link](https://arxiv.org/pdf/2211.09074.pdf). We invite our audience to try out the code.
+In addition, ActionFormer is the backbone for many winning solutions in the Ego4D Moment Queries Challenge 2022. Our submission in particular is ranked 2nd with a record 21.76% average mAP and 42.54% Recall@1x, tIoU=0.5, nearly three times higher than the official baseline. An arXiv version of our tech report can be found at [this link](https://arxiv.org/abs/2211.09074). We invite our audience to try out the code.
 
 <div align="center">
   <img src="teaser.jpg" width="600px"/>
@@ -12,7 +12,7 @@ In addition, ActionFormer is the backbone for many winning solutions in the Ego4
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
 ## Changelog
-* 11/18/2022: We have released the [tech report](https://arxiv.org/pdf/2211.09074.pdf) for our submission to the [Ego4D Moment Queries (MQ) Challenge](https://eval.ai/web/challenges/challenge-page/1626/overview). The code repo now includes config files, pre-trained models and results on the Ego4D MQ benchmark.
+* 11/18/2022: We have released the [tech report](https://arxiv.org/abs/2211.09074) for our submission to the [Ego4D Moment Queries (MQ) Challenge](https://eval.ai/web/challenges/challenge-page/1626/overview). The code repo now includes config files, pre-trained models and results on the Ego4D MQ benchmark.
 
 * 08/29/2022: Updated arXiv version.
 
@@ -340,17 +340,17 @@ This folder
 ```
 
 **Training and Evaluation**
-* We provide config files for training ActionFormer with three feature sets (SlowFast, Omnivore or EgoVLP alone, and SlowFast + Omnivore + EgoVLP). For example, training on all three features will create an experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
+* We provide config files for training ActionFormer with different feature combinations. For example, training on Omnivore and EgoVLP features will create an experiment folder under *./ckpt* that stores training config, logs, and checkpoints.
 ```shell
-python ./train.py ./configs/ego4d_slowfast_omnivore_egovlp.yaml --output reproduce
+python ./train.py ./configs/ego4d_omnivore_egovlp.yaml --output reproduce
 ```
 * [Optional] Monitor the training using TensorBoard
 ```shell
-tensorboard --logdir=./ckpt/ego4d_slowfast_omnivore_egovlp_reproduce/logs
+tensorboard --logdir=./ckpt/ego4d_omnivore_egovlp_reproduce/logs
 ```
-* Evaluate the trained model. The expected average mAP and Recall@1x, tIoU=0.5 should be around 21.0(%) and 38.5(%) respectively as in Table 1 of our tech report.
+* Evaluate the trained model. The expected average mAP and Recall@1x, tIoU=0.5 should be around 22.0(%) and 40.0(%) respectively.
 ```shell
-python ./eval.py ./configs/ego4d_slowfast_omnivore_egovlp.yaml ./ckpt/ego4d_slowfast_omnivore_egovlp_reproduce
+python ./eval.py ./configs/ego4d_omnivore_egovlp.yaml ./ckpt/ego4d_omnivore_egovlp_reproduce
 ```
 * Training our model on Ego4D with all three features requires ~4.5GB GPU memory, yet the inference might require over 10GB GPU memory. We recommend using a GPU with at least 12 GB of memory.
 
@@ -366,9 +366,9 @@ This folder
 │   ...  
 │
 └───pretrained/
-│    └───ego4d_slowfast_omnivore_egovlp_reproduce/
-│    │   └───ego4d_slowfast_omnivore_egovlp_reproduce_log.txt
-│    │   └───ego4d_slowfast_omnivore_egovlp_reproduce_results.txt
+│    └───ego4d_omnivore_egovlp_reproduce/
+│    │   └───ego4d_omnivore_egovlp_reproduce_log.txt
+│    │   └───ego4d_omnivore_egovlp_reproduce_results.txt
 │    │   └───...   
 │    └───...
 |
@@ -376,30 +376,34 @@ This folder
 │
 │   ...
 ```
-* The training config is recorded in *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/config.txt*.
-* The training log is located at *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/ego4d_slowfast_omnivore_egovlp_reproduce_log.txt* and also *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/logs*.
-* The pre-trained model is *./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/epoch_010.pth.tar*.
+* The training config is recorded in *./pretrained/ego4d_omnivore_egovlp_reproduce/config.txt*.
+* The training log is located at *./pretrained/ego4d_omnivore_egovlp_reproduce/ego4d_omnivore_egovlp_reproduce_log.txt* and also *./pretrained/ego4d_omnivore_egovlp_reproduce/logs*.
+* The pre-trained model is *./pretrained/ego4d_omnivore_egovlp_reproduce/epoch_010.pth.tar*.
 * Evaluate the pre-trained model.
 ```shell
-python ./eval.py ./configs/ego4d_slowfast_omnivore_egovlp.yaml ./pretrained/ego4d_slowfast_omnivore_egovlp_reproduce/
+python ./eval.py ./configs/ego4d_omnivore_egovlp.yaml ./pretrained/ego4d_omnivore_egovlp_reproduce/
 ```
 * The results (mAP at tIoUs) should be
 
 | Method                |  0.1  |  0.2  |  0.3  |  0.4  |  0.5  |  Avg  |
 |-----------------------|-------|-------|-------|-------|-------|-------|
 | ActionFormer (S)      | 20.09 | 17.45 | 14.44 | 12.46 | 10.00 | 14.89 |
-| ActionFormer (O)      | 23.43 | 20.62 | 17.75 | 14.68 | 11.92 | 17.68 |
-| ActionFormer (E)      | 26.07 | 23.08 | 20.02 | 16.97 | 13.96 | 20.02 |
-| ActionFormer (S+O+E)  | 27.22 | 24.01 | 20.77 | 17.81 | 14.92 | 20.95 |
+| ActionFormer (O)      | 23.87 | 20.78 | 18.39 | 15.33 | 12.65 | 18.20 |
+| ActionFormer (E)      | 26.84 | 23.86 | 20.57 | 17.19 | 14.54 | 20.60 |
+| ActionFormer (S+E)    | 27.98 | 24.46 | 21.21 | 18.56 | 15.60 | 21.56 |
+| ActionFormer (O+E)    | 27.99 | 24.94 | 21.94 | 19.05 | 15.98 | 21.98 |
+| ActionFormer (S+O+E)  | 28.26 | 24.69 | 21.88 | 19.35 | 16.28 | 22.09 |
 
 * The results (Recall@1x at tIoUs) should be
 
 | Method                |  0.1  |  0.2  |  0.3  |  0.4  |  0.5  |  Avg  |
 |-----------------------|-------|-------|-------|-------|-------|-------|
 | ActionFormer (S)      | 52.25 | 45.84 | 40.60 | 36.58 | 31.33 | 41.32 |
-| ActionFormer (O)      | 55.04 | 48.04 | 41.84 | 36.72 | 32.03 | 42.73 |
-| ActionFormer (E)      | 58.38 | 52.29 | 47.81 | 41.37 | 35.92 | 47.15 |
-| ActionFormer (S+O+E)  | 60.34 | 53.73 | 48.18 | 43.49 | 38.84 | 48.92 |
+| ActionFormer (O)      | 54.63 | 48.72 | 43.03 | 37.76 | 33.57 | 43.54 |
+| ActionFormer (E)      | 59.53 | 54.39 | 48.97 | 42.75 | 37.12 | 48.55 |
+| ActionFormer (S+E)    | 59.96 | 53.75 | 48.76 | 44.00 | 38.96 | 49.09 |
+| ActionFormer (O+E)    | 61.03 | 54.15 | 49.79 | 45.17 | 39.88 | 49.99 |
+| ActionFormer (S+O+E)  | 60.85 | 54.16 | 49.60 | 45.12 | 39.87 | 49.92 |
 
 ## Training and Evaluating Your Own Dataset
 Work in progress. Stay tuned.

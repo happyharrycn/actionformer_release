@@ -60,8 +60,9 @@ class PtTransformerClsHead(nn.Module):
 
         # use prior in model initialization to improve stability
         # this will overwrite other weight init
-        bias_value = -(math.log((1 - prior_prob) / prior_prob))
-        torch.nn.init.constant_(self.cls_head.conv.bias, bias_value)
+        if prior_prob > 0:
+            bias_value = -(math.log((1 - prior_prob) / prior_prob))
+            torch.nn.init.constant_(self.cls_head.conv.bias, bias_value)
 
         # a quick fix to empty categories:
         # the weights assocaited with these categories will remain unchanged
