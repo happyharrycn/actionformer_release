@@ -113,8 +113,10 @@ for video in videos:
         # save clip features
         si = (sf - prepend_frames) // stride
         ei = (ef + append_frames - clip_size) // stride
-        if ei > len(egovlp_video):
-            raise ValueError('end index exceeds feature length')
+        if ei > len(slowfast_video):
+            raise ValueError('end index exceeds slowfast feature length')
+        if ei > len(omnivore_video):
+            raise ValueError('end index exceeds omnivore feature length')
             
         slowfast_clip = slowfast_video[si:ei]
         omnivore_clip = omnivore_video[si:ei]
