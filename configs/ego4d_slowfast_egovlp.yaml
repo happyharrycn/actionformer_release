@@ -5,13 +5,12 @@ dataset: {
   json_file: ./data/ego4d/annotations/ego4d.json,
   feat_folder: [
     './data/ego4d/slowfast_features', 
-    './data/ego4d/omnivore_features', 
     './data/ego4d/egovlp_features'
   ],
   file_prefix: ~,
   file_ext: .npy,
   num_classes: 110,
-  input_dim: [2304, 1536, 256],
+  input_dim: 2560,
   feat_stride: 16,
   num_frames: 32,
   default_fps: 30,
@@ -34,10 +33,10 @@ model: {
   backbone_arch: [2, 2, 7],
   max_buffer_len_factor: 4.0,
   n_mha_win_size: 9,
-  n_head: 16,
-  embd_dim: [256, 384, 384],
-  fpn_dim: 1024,
-  head_dim: 1024,
+  n_head: 12,
+  embd_dim: 768,
+  fpn_dim: 768,
+  head_dim: 768,
   use_abs_pe: true,
 }
 opt: {

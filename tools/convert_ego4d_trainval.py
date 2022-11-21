@@ -42,6 +42,10 @@ os.makedirs(omnivore_out_dir, exist_ok=True)
 # where to save the processed annotations
 annot_out_path = 'annotations/ego4d.json'
 
+# clip size / stride in feature extraction
+clip_size = 32
+stride = 16
+
 
 with open(train_annot_path, 'r') as f:
     train_videos = json.load(f)['videos']
@@ -94,24 +98,22 @@ for video in videos:
             continue
         
         # align event onsets and offsets with feature grid
-        ## NOTE: clip stride is assumed to be 16
-        prepend_frames = sf % 16
+        prepend_frames = sf % stride
         prepend_sec = prepend_frames / fps
         duration += prepend_sec
         frames += prepend_frames
 
         append_frames = append_sec = 0
-        if frames % 16:
-            append_frames = 16 - frames % 16
+        if (frames - clip_size) % stride:
+            append_frames = stride - (frames - clip_size) % stride
             append_sec = append_frames / fps
             duration += append_sec
             frames += append_frames
 
         # save clip features
-        ## NOTE: clip size is assumed to be 32
-        si = (sf - prepend_frames) // 16
-        ei = (ef + append_frames) // 16 - 1
-        if ei > len(slowfast_video):
+        si = (sf - prepend_frames) // stride
+        ei = (ef + append_frames - clip_size) // stride
+        if ei > len(egovlp_video):
             raise ValueError('end index exceeds feature length')
             
         slowfast_clip = slowfast_video[si:ei]
