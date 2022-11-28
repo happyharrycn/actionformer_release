@@ -32,7 +32,7 @@ def main(args):
         ckpt_file = args.ckpt
     else:
         assert os.path.isdir(args.ckpt), "CKPT file folder does not exist!"
-        if args.epoch is not None:
+        if args.epoch > 0:
             ckpt_file = os.path.join(
                 args.ckpt, 'epoch_{:03d}.pth.tar'.format(args.epoch)
             )
@@ -115,7 +115,7 @@ if __name__ == '__main__':
                         help='path to a config file')
     parser.add_argument('ckpt', type=str, metavar='DIR',
                         help='path to a checkpoint')
-    parser.add_argument('epoch', type=int,
+    parser.add_argument('-epoch', type=int, default=-1,
                         help='checkpoint epoch')
     parser.add_argument('-t', '--topk', default=-1, type=int,
                         help='max number of output actions (default: -1)')
