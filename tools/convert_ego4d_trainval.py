@@ -159,6 +159,9 @@ for video in videos:
                     'label_id': label_map[label],
                 }]
 
+        if len(annotations) == 0:
+            continue
+
         database[cid] = {
             'subset': subset,
             'duration': round(duration, 2),
