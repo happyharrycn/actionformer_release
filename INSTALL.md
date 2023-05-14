@@ -6,7 +6,7 @@
 - TensorBoard
 - CUDA 11.0+
 - GCC 4.9+
-- NumPy 1.11+
+- 1.11 <= Numpy <= 1.23
 - PyYaml
 - Pandas
 - h5py
