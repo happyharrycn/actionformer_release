@@ -64,9 +64,13 @@ We provide a step-by-step tutorial on how to train your custom dataset with Acti
    - You may refer to the `libs/datasets/thumos14.py` for details.
    - You may need to change some information in the dataset file, e.g., db_attributes to control the evaulation settings, e.g., the tIoU for evaluation.
 
-6. Create a config file for THUMOS14.
-   - You may refer to the `configs/thumos14_i3d.py` for details.   
-   - You may need to change some items in the config file, e.g., `train_split` and `val_split` for the subset name. `json_file` and `feat_folder` for dataset location, `feat_stride` (as `frequency` in step 3).  
+6. Add the dataset name to the Dataset Registry.
+
+   - In the `libs/__init__.py` file, include the dataset name you set in step 5 within `@register_dataset()`.
+
+7. Create a config file for THUMOS14.
+   - You may refer to the `configs/thumos14_i3d.yaml` for details.   
+   - You may need to change some items in the config file, e.g., `train_split` and `val_split` for the subset name. `json_file` and `feat_folder` for dataset location, `feat_stride` (as `frequency` in step 3).
 
 7. Start to train and eval on your dataset.
    - Please refer to `tools/run_all_exps.sh` to get some examples for training/testing.
