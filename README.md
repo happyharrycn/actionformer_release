@@ -11,7 +11,7 @@ In addition, ActionFormer is the backbone for many winning solutions in the Ego4
 
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
-Related projects:
+**Related projects**:
 > [**SnAG: Scalable and Accurate Video Grounding**](https://arxiv.org/abs/2404.02257) <br>
 > Fangzhou Mu\*, Sicheng Mo\*, Yin Li <br>
 > *CVPR 2024* <br>
