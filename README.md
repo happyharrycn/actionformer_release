@@ -11,6 +11,12 @@ In addition, ActionFormer is the backbone for many winning solutions in the Ego4
 
 Specifically, we adopt a minimalist design and develop a Transformer based model for temporal action localization, inspired by the recent success of Transformers in NLP and vision. Our method, illustrated in the figure, adapts local self-attention to model temporal context in untrimmed videos, classifies every moment in an input video, and regresses their corresponding action boundaries. The result is a deep model that is trained using standard classification and regression loss, and can localize moments of actions in a single shot, without using action proposals or pre-defined anchor windows.
 
+Related projects:
+> [**SnAG: Scalable and Accurate Video Grounding**](https://arxiv.org/abs/2404.02257) <br>
+> Fangzhou Mu\*, Sicheng Mo\*, Yin Li <br>
+> *CVPR 2024* <br>
+[![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/fmu2/snag_release)  [![github](https://img.shields.io/github/stars/fmu2/snag_release.svg?style=social)](https://github.com/fmu2/snag_release)  [![arXiv](https://img.shields.io/badge/Arxiv-2404.02257-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2404.02257) <br>
+
 ## Changelog
 * 11/18/2022: We have released the [tech report](https://arxiv.org/abs/2211.09074) for our submission to the [Ego4D Moment Queries (MQ) Challenge](https://eval.ai/web/challenges/challenge-page/1626/overview). The code repo now includes config files, pre-trained models and results on the Ego4D MQ benchmark.
 
